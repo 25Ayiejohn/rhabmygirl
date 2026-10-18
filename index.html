@@ -33,3 +33,1307 @@ html,body{margin:0;height:100%;overflow:hidden;background:#000;font-family:syste
 #gear{position:absolute;top:12px;right:12px;width:44px;height:44px;border-radius:50%;border:1px solid #1d3558;background:#0b1830;color:#dfe9ff;font-size:20px;cursor:pointer;z-index:3}
 #dock{position:absolute;left:0;right:0;bottom:0;padding:12px 12px calc(12px + env(safe-area-inset-bottom));display:flex;justify-content:center;z-index:2;transition:all .28s ease}
 #row{width:min(640px,100%);display:flex;align-items:center;gap:8px;background:#0b1830;border:1px solid #1d3558;border-radius:999px;padding:6px}
+#txt{flex:1;min-width:0;border:0;outline:0;background:transparent;color:#dfe9ff;font-size:16px;padding:10px 14px;direction:rtl}
+#mic{--lvl:0;flex:0 0 auto;width:48px;height:48px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:linear-gradient(145deg,#f8fafc,#cbd5e1);color:#0b1220;display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 18px #0008;transform:scale(calc(1 + var(--lvl) * .12));transition:transform .06s linear,background .2s}
+#mic svg{width:22px;height:22px;display:block}
+#mic.on{background:linear-gradient(145deg,#fff,#dbeafe);box-shadow:0 0 0 5px #93c5fd22,0 0 28px #60a5fa55}
+#mic.rec{animation:pulse 1.4s infinite}
+@keyframes pulse{50%{filter:brightness(1.3)}}
+#mic:disabled{opacity:.4;cursor:not-allowed}
+#send{flex:0 0 auto;width:46px;height:46px;border-radius:50%;border:0;background:#2563eb;color:#fff;font-size:18px;cursor:pointer}
+#voicePanel{display:none;position:relative;width:min(640px,100%);min-height:145px;padding:14px 20px 10px;border:0;border-radius:0;background:transparent;box-shadow:none;align-items:center;justify-content:center;flex-direction:column;gap:13px;backdrop-filter:none;overflow:visible}
+#voicePanel.active{display:flex;animation:voiceIn .3s cubic-bezier(.2,.8,.2,1) both}
+#voiceLabel{font-size:13px;color:#dbeafe;letter-spacing:.02em;text-shadow:0 2px 14px #60a5fa55;min-height:18px}
+#voiceOrb{--lvl:0;position:relative;width:70px;height:70px;border:1px solid #dbeafe90;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 25%,#ffffff 0%,#dbeafe 35%,#93c5fd 72%,#3b82f6 100%);box-shadow:0 0 calc(18px + var(--lvl)*30px) #60a5fa99,0 0 0 calc(3px + var(--lvl)*8px) #60a5fa18;transition:box-shadow .08s,transform .08s;cursor:pointer}
+#voiceOrb:before,#voiceOrb:after{content:"";position:absolute;inset:-8px;border:1px solid #dbeafe55;border-radius:50%;animation:orbPulse 2.4s ease-out infinite}
+#voiceOrb:after{animation-delay:1.2s}#voiceOrb svg{width:26px;height:26px;color:#111827;z-index:1}
+#voiceClose{position:absolute;top:0;left:12px;width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:#dbeafe;font-size:24px;cursor:pointer;opacity:.75}
+#voicePanel{position:relative}#voiceBars{height:18px;display:flex;align-items:center;gap:3px;opacity:.75}#voiceBars i{display:block;width:3px;height:5px;border-radius:5px;background:#e2e8f0;animation:voiceWave .8s ease-in-out infinite alternate}#voiceBars i:nth-child(2n){animation-delay:.15s}#voiceBars i:nth-child(3n){animation-delay:.3s}#voiceBars i:nth-child(4n){animation-delay:.45s}
+@keyframes voiceWave{to{height:17px;opacity:.45}}@keyframes orbPulse{0%{transform:scale(.92);opacity:.65}100%{transform:scale(1.28);opacity:0}}@keyframes voiceIn{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+#stage.voice-mode #row{display:none}#stage.voice-mode #dock{padding:12px 14px 18px}#stage.voice-mode #voicePanel.active{display:flex}
+#panel{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(92%,440px);max-height:82%;overflow:auto;background:#0b1830;border:1px solid #1d3558;border-radius:18px;padding:16px;display:none;z-index:5}
+#panel.open{display:block}
+#panel label{display:block;font-size:13px;color:#7f98c4;margin:12px 0 5px}
+#panel input,#panel select{width:100%;padding:9px 11px;border-radius:10px;border:1px solid #1d3558;background:#06101f;color:#dfe9ff;font-size:14px}
+#panel .r{display:flex;gap:8px}
+#panel .r>*{flex:1;min-width:0}
+#panel button{border:1px solid #1d3558;background:#122546;color:#dfe9ff;border-radius:12px;padding:8px 12px;font-size:13px;cursor:pointer;margin:2px}
+#panel #tst{width:100%;margin-top:12px}
+#counters{font-size:13px;line-height:1.9;background:#06101f;border-radius:10px;padding:8px 10px}
+.grid{display:flex;flex-wrap:wrap;gap:6px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chcard{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 6px;text-align:center}
+.chcard svg{width:100%;height:auto;display:block}
+.chcard b{font-size:14px;color:#dfe9ff}
+.chcard small{font-size:11px;color:#7f98c4;line-height:1.5}
+.chcard.sel{border-color:#60a5fa;box-shadow:0 0 0 2px #60a5fa66}
+#stage.nocap #bubble{display:none!important}
+#stage.bigtext .kinetic-copy .kinetic-words{font-size:clamp(30px,7.5vw,68px)!important}
+#stage.bigtext #panel label{font-size:15px}
+#onb .chcard b{font-size:15px}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="world">
+    <svg id="avatar" viewBox="-260 -200 520 400" aria-label="الوجه">
+      <defs>
+        <linearGradient id="gBL" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffffff"/><stop offset="0.58" stop-color="#fbfdff"/><stop offset="1" stop-color="#dce8f4"/>
+        </linearGradient>
+        <linearGradient id="gBR" x1="1" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffffff"/><stop offset="0.58" stop-color="#fbfdff"/><stop offset="1" stop-color="#dce8f4"/>
+        </linearGradient>
+        <linearGradient id="gEye" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffffff"/><stop offset="0.58" stop-color="#e0f2fe"/><stop offset="1" stop-color="#7dd3fc"/>
+        </linearGradient>
+        <filter id="bGlow" x="-40%" y="-100%" width="180%" height="300%">
+          <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#ffffff" flood-opacity="0.32"/>
+        </filter>
+      </defs>
+      <g id="faceG">
+        <g id="eyes"></g>
+        <path id="browL" fill="url(#gBL)" filter="url(#bGlow)"/>
+        <path id="browR" fill="url(#gBR)" filter="url(#bGlow)"/>
+        <g transform="translate(0,120)">
+          <path id="mouth" fill="#ffffff" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" d="M -55 0 L 55 0"/>
+        </g>
+      </g>
+    </svg>
+    <div class="hand" id="handL"></div>
+    <div class="hand" id="handR"></div>
+    <div id="prop"></div>
+  </div>
+  <div id="stat"></div>
+  <div id="bubble" aria-live="polite"></div>
+  <button id="gear" aria-label="الإعدادات">⚙️</button>
+  <div id="dock">
+    <div id="row">
+      <input id="txt" placeholder="اكتب أو تكلّم معه...">
+      <button id="mic" type="button" title="وضع المحادثة الصوتية" aria-label="بدء المحادثة الصوتية"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3m-4 0h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+      <button id="send" aria-label="أرسل">➤</button>
+    </div>
+    <div id="voicePanel" aria-live="polite">
+      <button id="voiceClose" type="button" aria-label="إنهاء وضع الصوت">×</button>
+      <div id="voiceOrb" role="button" tabindex="0" aria-label="تفعيل الميكروفون"><svg viewBox="0 0 24 24" fill="none"><rect x="9" y="3" width="6" height="12" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3m-4 0h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <div id="voiceBars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div id="voiceLabel">اضغط للتحدث</div>
+    </div>
+  </div>
+  <div id="onb" style="display:none;position:absolute;inset:0;z-index:6;background:rgba(0,0,0,.82);align-items:center;justify-content:center;padding:16px">
+    <div style="background:#0b1830;border:1px solid #1d3558;border-radius:18px;padding:18px;width:min(94%,440px);max-height:92%;overflow:auto">
+      <b style="font-size:18px">أهلاً! اختار شخصيتك</b>
+      <p style="font-size:13px;color:#9fb8e0;line-height:1.7">تقدر تغيّرها بعدين من ⚙️. عشان الشخصية تتكلم محتاج رابط الخادم أو مفتاح Gemini.</p>
+      <div id="onbChars" class="cards"></div>
+      <label style="display:block;font-size:13px;color:#7f98c4;margin:12px 0 5px">رابط الخادم (مُفضّل)</label>
+      <input id="onbProxy" placeholder="https://your-worker.workers.dev" style="width:100%;padding:9px;border-radius:10px;border:1px solid #1d3558;background:#06101f;color:#dfe9ff;direction:ltr">
+      <button id="onbGo" style="width:100%;margin-top:12px;padding:10px;border-radius:12px;border:0;background:#2563eb;color:#fff;font-size:15px;cursor:pointer">ابدأ</button>
+    </div>
+  </div>
+  <div id="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center"><b>⚙️ الإعدادات</b><button id="close" aria-label="إغلاق">✕</button></div>
+    <label>اختيار النموذج (الشخصية)</label>
+    <div id="chars" class="cards"></div>
+    <label>رابط الخادم (مُفضّل: المفاتيح تبقى على الخادم)</label>
+    <input id="proxy" placeholder="https://your-worker.workers.dev" style="direction:ltr" autocomplete="off">
+    <label>مفتاح Gemini API (بديل لو مفيش خادم)</label>
+    <div class="r">
+      <input id="key" type="password" placeholder="الصق المفتاح هنا" autocomplete="off">
+      <input id="mdl" list="mdls" value="gemini-3.8-flash" style="direction:ltr">
+      <datalist id="mdls"><option value="gemini-3.8-flash"><option value="gemini-3.5-flash-lite"><option value="gemini-2.5-flash-lite"></datalist>
+    </div>
+    <label>مفتاح ElevenLabs (فارغ = صوت المتصفح في المحادثة الصوتية)</label>
+    <input id="elkey" type="password" placeholder="اختياري" autocomplete="off">
+    <label>الصوت</label>
+    <div class="r">
+      <select id="evoice"><option value="JBFqnCBsd6RMkjVDRZzb">صوت افتراضي (George)</option></select>
+      <button id="ldv">تحميل أصواتي</button>
+    </div>
+    <label>نموذج الصوت</label>
+    <select id="emodel"><option value="eleven_v3">eleven_v3 (تعبيرات صوتية)</option><option value="eleven_flash_v2_5">eleven_flash_v2_5 (الأسرع)</option><option value="eleven_multilingual_v2">eleven_multilingual_v2 (أجود)</option></select>
+    <button id="tst">🔈 جرّب الصوت</button>
+    <label>الراحة وإمكانية الوصول</label>
+    <div class="grid"><button id="tRM">تقليل الحركة</button><button id="tCap">الكابشن</button><button id="tBig">خط كبير</button><button id="tOnb">شاشة البداية</button></div>
+    <label>العدادات</label>
+    <div id="counters"></div>
+    <label>تعبيرات تجريبية</label>
+    <div id="emo" class="grid"></div>
+    <label>إيماءات تجريبية</label>
+    <div id="gest" class="grid"></div>
+    <label>حركة الجسم تجريبية</label>
+    <div id="mv" class="grid"></div>
+    <label>أفعال افتراضية (وهي ساكتة)</label>
+    <div id="acts" class="grid"></div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const bubble = $('bubble'), txt = $('txt'), micBtn = $('mic');
+
+/* ---------- Expressions ----------
+   oL/oR eye openness, t lid tilt, h happy squint, mc mouth curve, mo mouth open,
+   lx/ly gaze, br brow height (+ raised), bt brow tilt (+ angry, inner corners down) */
+const KEYS = ['oL','oR','t','h','mc','mo','lx','ly','br','bt','ar','ba'];
+const EMO = {
+  calm:      {oL:1,   oR:1,   t:0,    h:0,    mc:0.35, mo:0,   lx:0,    ly:0,   br:0,    bt:0,    n:'هادئ'},
+  kind:      {oL:0.9, oR:0.9, t:0,    h:0.35, mc:0.9,  mo:0,   lx:0,    ly:0,   br:0.15, bt:0,    n:'لطيف'},
+  angry:     {oL:0.6, oR:0.6, t:0.6,  h:0,    mc:-0.5, mo:0,   lx:0,    ly:0,   br:-0.8, bt:0.6,  n:'غاضب'},
+  sad:       {oL:0.75,oR:0.75,t:-0.5, h:0,    mc:-0.7, mo:0,   lx:0,    ly:0.3, br:0.6,  bt:-0.5, n:'حزين'},
+  surprised: {oL:1.25,oR:1.25,t:0,    h:0,    mc:0,    mo:0.6, lx:0,    ly:0,   br:1,    bt:0,    n:'متفاجئ'},
+  think:     {oL:0.8, oR:0.8, t:0.15, h:0,    mc:0.1,  mo:0,   lx:0.6,  ly:-0.6,br:-0.2, bt:0.15, ba:0.75, n:'تفكير'},
+  wave:      {oL:1,   oR:1,   t:0,    h:0.2,  mc:1,    mo:0.1, lx:0,    ly:0,   br:0.3,  bt:0,    n:'ترحيب'},
+  laugh:     {oL:0.5, oR:0.5, t:0,    h:0.6,  mc:1.2,  mo:0.8, lx:0,    ly:0,   br:0.4,  bt:-0.05,n:'ضحك'},
+  cry:       {oL:0.7, oR:0.7, t:-0.5, h:0,    mc:-1,   mo:0.2, lx:0,    ly:0.3, br:0.9,  bt:-0.4, n:'بكاء'},
+  listen:    {oL:1.1, oR:1.1, t:0.1,  h:0,    mc:0.3,  mo:0,   lx:0,    ly:0,   br:0.25, bt:0.1,  n:'استماع'},
+  sleepy:    {oL:0.35,oR:0.35,t:-0.2, h:0,    mc:0.2,  mo:0,   lx:0,    ly:0.3, br:-0.1, bt:-0.2, n:'نعسان'},
+  love:      {oL:0.8, oR:0.8, t:0,    h:0.55, mc:1,    mo:0.2, lx:0,    ly:0,   br:0.3,  bt:0,    n:'حب'}
+};
+
+// Brow curvature per expression: + arched (happy/surprised), - flatter/drooping (sad/angry)
+const AR = {calm:0.5, kind:0.8, angry:-0.5, sad:-0.2, surprised:1.2, think:0.2, wave:0.8, laugh:0.9, cry:-0.4, listen:0.5, sleepy:-0.3, love:0.7};
+for (const k in EMO) { EMO[k].ar = AR[k] ?? 0.5; if (EMO[k].ba === undefined) EMO[k].ba = 0; }
+
+let EYE_SHAPE = 'round', RIM = '#ffffff';
+function eyeSVG(id){
+  const fill = 'url(#gEye)';
+  let shape;
+  if (EYE_SHAPE === 'visor')       shape = `<rect x="-96" y="-58" width="192" height="116" rx="58" fill="${fill}" stroke="${RIM}" stroke-width="2.5"/>`;
+  else if (EYE_SHAPE === 'square') shape = `<rect x="-84" y="-84" width="168" height="168" rx="34" fill="${fill}" stroke="${RIM}" stroke-width="2.5"/>`;
+  else if (EYE_SHAPE === 'dot')    shape = `<circle cx="0" cy="0" r="70" fill="${fill}" stroke="${RIM}" stroke-width="2.5"/>`;
+  else                             shape = `<circle cx="0" cy="0" r="88" fill="${fill}" stroke="${RIM}" stroke-width="2.5"/>`;
+  return `<g id="${id}">
+    ${shape}
+    <circle cx="-20" cy="-28" r="15" fill="#ffffff" opacity=".20"/>
+    <g id="${id}-ir"></g>
+    <path id="${id}-lt" fill="#000"/>
+    <path id="${id}-lb" fill="#000"/>
+  </g>`;
+}
+$('eyes').innerHTML = eyeSVG('eyeL') + eyeSVG('eyeR');
+
+function drawEye(id, o, cx, side, t, h, lx, ly){
+  const s = Math.max(o, 1), oc = Math.min(o, 1);
+  $(id).setAttribute('transform', `translate(${cx},-20) scale(${s.toFixed(3)})`);
+  $(id+'-ir').setAttribute('transform', `translate(${(lx*16).toFixed(2)},${(ly*12).toFixed(2)})`);
+  const top = -88 + (1 - oc) * 176;
+  const y = x => top + side * t * 36 * (x / 80);
+  $(id+'-lt').setAttribute('d',
+    `M -140 -320 L 140 -320 L 140 ${y(140).toFixed(2)} L -140 ${y(-140).toFixed(2)} Z`);
+  const bb = 88 - h * 62;
+  $(id+'-lb').setAttribute('d',
+    `M -140 320 L -140 ${(bb+40).toFixed(2)} Q 0 ${(bb-40).toFixed(2)} 140 ${(bb+40).toFixed(2)} L 140 320 Z`);
+}
+// Eyebrows: same colour as the eyes; raised by br, tilted by bt (inner corners down when angry)
+const browL = $('browL'), browR = $('browR');
+// Each brow is a tapered crescent: thick in the middle, thin at both ends.
+// br raises it, bt tilts it (inner end lower when angry), ar arches it.
+function browPath(side, br, bt, ar){
+  // Curved, tapered brows with soft asymmetry for a more alive expression.
+  const ox = side * 215, ix = side * 85;
+  const y = -145 - br * 24, tilt = bt * 19;
+  const oy = y - tilt, iy = y + tilt;
+  const mx = (ox + ix) / 2;
+  const arch = 9 + ar * 14;
+  const topY = (oy + iy) / 2 - arch;
+  const thickness = 6.2;
+  const outerCtrlX = ox + (ix - ox) * 0.28;
+  const innerCtrlX = ox + (ix - ox) * 0.72;
+  return `M ${ox} ${oy.toFixed(1)}
+    C ${outerCtrlX.toFixed(1)} ${(oy-arch*0.78).toFixed(1)}
+      ${innerCtrlX.toFixed(1)} ${(iy-arch*1.08).toFixed(1)} ${ix} ${iy.toFixed(1)}
+    Q ${mx.toFixed(1)} ${(topY+thickness).toFixed(1)} ${ox} ${(oy+thickness*0.35).toFixed(1)}
+    Q ${(ox- side*4).toFixed(1)} ${(oy+1.5).toFixed(1)} ${ox} ${oy.toFixed(1)} Z`;
+}
+function drawBrows(br, bt, ar, ba=0){
+  // Thinking lifts one brow slightly more than the other.
+  browL.setAttribute('d', browPath(-1, br - ba*0.45, bt, ar));
+  browR.setAttribute('d', browPath(1, br + ba*0.45, bt, ar));
+}
+const mouthEl = $('mouth');
+let MOUTH_COL = '#ffffff';
+function drawMouth(mc, mo){
+  const c = mc * 60, b = mc * 60 + mo * 120;
+  mouthEl.setAttribute('d', `M -55 0 Q 0 ${c.toFixed(2)} 55 0 Q 0 ${b.toFixed(2)} -55 0 Z`);
+  mouthEl.setAttribute('fill-opacity', Math.min(mo * 4, 1).toFixed(2));
+  mouthEl.setAttribute('stroke', MOUTH_COL);
+  mouthEl.setAttribute('fill', MOUTH_COL);
+}
+
+/* ---------- Hands (floating, VR-style) ---------- */
+let HAND_T = {fill:'#eef4ff', stroke:'#7b6cff'};
+function handSVG(side){
+  const s = side === 'L' ? 1 : -1;
+  return `<svg viewBox="-50 -50 100 100"><g fill="${HAND_T.fill}" stroke="${HAND_T.stroke}" stroke-width="3" stroke-linejoin="round">
+    <rect x="-24" y="-8" width="48" height="42" rx="20"/>
+    <rect x="-22" y="-44" width="9" height="40" rx="4.5"/>
+    <rect x="-11" y="-48" width="9" height="44" rx="4.5"/>
+    <rect x="0" y="-46" width="9" height="42" rx="4.5"/>
+    <rect x="11" y="-42" width="9" height="38" rx="4.5"/>
+    <rect x="${s*20-7}" y="-4" width="14" height="28" rx="7" transform="rotate(${-s*28} ${s*20} 10)"/>
+  </g></svg>`;
+}
+$('handL').innerHTML = handSVG('L');
+$('handR').innerHTML = handSVG('R');
+const handEl = {L: $('handL'), R: $('handR')};
+
+/* ---------- Virtual props (imaginary objects drawn in the hand) ---------- */
+const PROPS = {
+  mug:    `<svg viewBox="-40 -40 80 80"><path d="M-18 -14 H14 V16 Q14 24 6 24 H-10 Q-18 24 -18 16 Z" fill="#fff" stroke="#7b6cff" stroke-width="3"/><path d="M14 -4 q12 0 12 10 t-12 10" fill="none" stroke="#7b6cff" stroke-width="3"/><path d="M-6 -22 q-5 -6 0 -12 M4 -22 q-5 -6 0 -12" fill="none" stroke="#9fb8e0" stroke-width="3" stroke-linecap="round"/></svg>`,
+  phone:  `<svg viewBox="-40 -40 80 80"><rect x="-16" y="-28" width="32" height="56" rx="7" fill="#14102a" stroke="#7b6cff" stroke-width="3"/><rect x="-11" y="-21" width="22" height="38" rx="3" fill="#3b82f6"/></svg>`,
+  book:   `<svg viewBox="-40 -40 80 80"><path d="M-30 -18 Q-10 -24 0 -16 Q10 -24 30 -18 V20 Q10 14 0 22 Q-10 14 -30 20 Z" fill="#eef4ff" stroke="#7b6cff" stroke-width="3" stroke-linejoin="round"/></svg>`,
+  pencil: `<svg viewBox="-40 -40 80 80"><g transform="rotate(-35)"><rect x="-5" y="-30" width="10" height="46" fill="#fbbf24" stroke="#7b6cff" stroke-width="2"/><path d="M-5 16 L0 28 L5 16 Z" fill="#eef4ff"/></g></svg>`,
+  flower: `<svg viewBox="-40 -40 80 80"><path d="M0 -4 V34" stroke="#4ade80" stroke-width="4"/><circle cx="0" cy="-14" r="8" fill="#f9a8d4"/><circle cx="-10" cy="-8" r="6" fill="#f9a8d4"/><circle cx="10" cy="-8" r="6" fill="#f9a8d4"/><circle cx="0" cy="-14" r="4" fill="#fde68a"/></svg>`,
+  ball:   `<svg viewBox="-40 -40 80 80"><circle r="20" fill="#f97316" stroke="#7b6cff" stroke-width="3"/><path d="M-20 0 H20 M0 -20 V20" stroke="#fff" stroke-width="3" opacity=".7"/></svg>`,
+  heart:  `<svg viewBox="-40 -40 80 80"><path d="M0 14 C-30 -6 -18 -30 0 -14 C18 -30 30 -6 0 14 Z" fill="#f472b6"/></svg>`
+};
+const propEl = $('prop');
+let propName = null, propAt = 'R';
+function setProp(p){
+  if (!p){ propName = null; propEl.style.opacity = 0; return; }
+  if (propName !== p.n){ propEl.innerHTML = PROPS[p.n] || ''; propName = p.n; }
+  propAt = p.at || 'R';
+  propEl.style.opacity = 1;
+}
+
+// Gesture targets: [x, y, rotation] in vmin units relative to the avatar center
+const REST = {L:[-40,30,-15], R:[40,30,15]};
+const GEST = {
+  none:     {L:[-40,30,-15], R:[40,30,15]},
+  wave:     {L:[-40,30,-15], R:[44,-18,40], anim:'wave'},
+  point:    {L:[-40,30,-15], R:[62,-2,90]},
+  self:     {L:[-12,30,0],   R:[12,30,0]},
+  describe: {L:[-62,-6,-60], R:[62,-6,60]},
+  question: {L:[-40,30,-15], R:[30,-40,20], anim:'sway'},
+  shrug:    {L:[-46,38,-40], R:[46,38,40]},
+  clap:     {L:[-6,22,0],    R:[6,22,0],   anim:'clap'}
+};
+const MOVE = {center:[0,0], left:[-28,0], right:[28,0], up:[0,-12], down:[0,10]};
+
+const HT = {L:{x:-40,y:30,r:-15}, R:{x:40,y:30,r:15}};
+const HC = {L:{x:-40,y:30,r:-15}, R:{x:40,y:30,r:15}};
+const HPOS = {L:{x:0,y:0}, R:{x:0,y:0}};
+let handAnim = 'none';
+const AVT = {x:0, y:0}, AV = {x:0, y:0, rot:0};
+let hopUntil = 0, idleWanderAt = 0, lastFrame = performance.now();
+
+function setHandsRaw(L, R){
+  HT.L = {x:L[0], y:L[1], r:L[2]};
+  HT.R = {x:R[0], y:R[1], r:R[2]};
+}
+function setGesture(g){
+  const k = GEST[g] ? g : 'none', G = GEST[k];
+  setHandsRaw(G.L, G.R);
+  handAnim = G.anim || 'none';
+}
+function setMove(m){
+  if (!MOVE[m]) return;
+  AVT.x = MOVE[m][0]; AVT.y = MOVE[m][1];
+  idleWanderAt = performance.now() + 4000;
+}
+function hop(){ hopUntil = performance.now() + 400; }
+
+/* ---------- Animation loop ---------- */
+let tgt = {...EMO.calm}, cur = {...EMO.calm};
+let blinkEnd = 0, lipFn = null, mouthLvl = 0;
+let headMood = null, headUntil = 0;
+let talking = false;
+
+function setEmo(k, alt = false){
+  const b = {...(EMO[k] || EMO.calm)};
+  if (alt){ b.mc += 0.15; b.oL += 0.05; b.oR += 0.05; }
+  tgt = b;
+}
+
+function frame(now){
+  const dt = Math.min(0.05, (now - lastFrame) / 1000); lastFrame = now;
+  const t = now / 1000;
+  const W = $('world').clientWidth, H = $('world').clientHeight;
+  const vm = Math.min(W, H) / 100;
+  const k = 1 - Math.exp(-dt * 5), kh = 1 - Math.exp(-dt * 9);
+
+  // Face
+  for (const key of KEYS) cur[key] += (tgt[key] - cur[key]) * 0.2;
+  let oL = cur.oL, oR = cur.oR;
+  if (now < blinkEnd){ oL = Math.min(oL, 0.05); oR = Math.min(oR, 0.05); }
+  const lipV = lipFn ? lipFn(now) : 0;
+  mouthLvl += (lipV - mouthLvl) * 0.5;
+  const mo = Math.max(cur.mo, mouthLvl);
+  const sweep = handAnim === 'look' ? Math.sin(t * 1.2) * 0.7 : 0;
+  const lx = cur.lx + sweep + Math.sin(now/1400) * 0.08;
+  const ly = cur.ly + Math.cos(now/1700) * 0.05;
+  drawEye('eyeL', oL, -150,  1, cur.t, cur.h, lx, ly);
+  drawEye('eyeR', oR,  150, -1, cur.t, cur.h, lx, ly);
+  drawBrows(cur.br, cur.bt, cur.ar, cur.ba);
+  drawMouth(cur.mc, mo);
+  const hx = (headMood === 'shake' && now < headUntil) ? Math.sin(now/60) * 10 : 0;
+  const hy = (headMood === 'nod'   && now < headUntil) ? Math.sin(now/90) * 8  : 0;
+  $('faceG').setAttribute('transform', `translate(${hx.toFixed(1)},${hy.toFixed(1)})`);
+
+  // Body: wanders when idle, goes where the reply asks, breathes
+  if (!talking && !actActive && now > idleWanderAt){
+    AVT.x = (Math.random() - 0.5) * 30;
+    AVT.y = (Math.random() - 0.5) * 12;
+    idleWanderAt = now + 6000 + Math.random() * 6000;
+  }
+  AV.x += (AVT.x - AV.x) * k;
+  AV.y += (AVT.y - AV.y) * k;
+  AV.rot += (AV.x * 0.3 - AV.rot) * k;
+  const bob = (talking ? Math.sin(t * 6) * 0.8 : Math.sin(t * 1.2) * 0.4) * ENERGY * (RM ? 0.3 : 1);
+  const hopY = (now < hopUntil && !RM) ? -Math.sin((1 - (hopUntil - now) / 400) * Math.PI) * 6 : 0;
+  const cx = W / 2 + AV.x * vm;
+  const cy = (H - 120) / 2 + (AV.y + bob) * vm + hopY * vm;
+  const aw = 60 * vm, ah = aw * 400 / 520;
+  const av = $('avatar');
+  av.style.width = aw + 'px';
+  av.style.left = (cx - aw / 2) + 'px';
+  av.style.top = (cy - ah / 2) + 'px';
+  av.style.transform = `rotate(${AV.rot.toFixed(2)}deg)`;
+
+  // Hands
+  ['L','R'].forEach(s => {
+    const c = HC[s], g = HT[s];
+    c.x += (g.x - c.x) * kh; c.y += (g.y - c.y) * kh; c.r += (g.r - c.r) * kh;
+    const ph = s === 'L' ? 0 : Math.PI;
+    let x = c.x, y = c.y + Math.sin(t * 2 + (s === 'L' ? 0 : 1.6)) * 1.2, r = c.r;
+    switch (handAnim){
+      case 'wave':    if (s === 'R') r += Math.sin(t * 9) * 22; break;
+      case 'sway':    if (s === 'R') r += Math.sin(t * 2.5) * 8; break;
+      case 'clap':    { const d = Math.sin(t * 12) * 9; x += s === 'L' ? d : -d; } break;
+      case 'write':   if (s === 'R'){ x += Math.cos(t * 10) * 1.6; y += Math.sin(t * 10) * 1.6; } break;
+      case 'juggle':  if (s === 'L') y -= Math.abs(Math.sin(t * 5)) * 12; break;
+      case 'dance':   y += Math.sin(t * 6 + ph) * 5; r += Math.sin(t * 6 + ph) * 12; break;
+      case 'breathe': y += Math.sin(t * 1.5) * 1.2; break;
+      case 'scratch': if (s === 'R') x += Math.sin(t * 14) * 2.5; break;
+      case 'tap':     if (s === 'R') y -= Math.abs(Math.sin(t * 5)) * 3; break;
+    }
+    const hs = vm * 24;
+    const el = handEl[s];
+    el.style.width = hs + 'px'; el.style.height = hs + 'px';
+    const px = cx + x * vm, py = cy + y * vm;
+    HPOS[s] = {x: px, y: py};
+    el.style.transform = `translate(${px.toFixed(1)}px,${py.toFixed(1)}px) translate(-50%,-50%) rotate(${r.toFixed(1)}deg)`;
+  });
+
+  // Prop: follows the hand it is held in
+  if (propName){
+    let pp;
+    if (propAt === 'R') pp = HPOS.R;
+    else if (propAt === 'L') pp = HPOS.L;
+    else if (propAt === 'mouth') pp = {x: cx, y: cy + 14 * vm};
+    else pp = {x: (HPOS.L.x + HPOS.R.x) / 2, y: (HPOS.L.y + HPOS.R.y) / 2};
+    const ps = vm * 22;
+    propEl.style.width = ps + 'px'; propEl.style.height = ps + 'px';
+    const pr = propAt === 'R' ? HC.R.r * 0.5 : 0;
+    propEl.style.transform = `translate(${pp.x.toFixed(1)}px,${pp.y.toFixed(1)}px) translate(-50%,-50%) rotate(${pr.toFixed(1)}deg)`;
+  }
+
+  requestAnimationFrame(frame);
+}
+
+let ENERGY = 1, RM = false, CH_BLINK = [2000, 5000];
+(function blinkLoop(){
+  setTimeout(() => { blinkEnd = performance.now() + 140; blinkLoop(); }, CH_BLINK[0] + Math.random() * (CH_BLINK[1] - CH_BLINK[0]));
+})();
+
+/* ---------- Idle activities: she keeps doing things with imaginary objects when silent ----------
+   Each step: hands [x,y,rot], emotion, optional face overrides, prop, animation, duration (ms). */
+const ACTS = {
+  drink:   {n:'تشرب من كوب', steps:[
+    {dur:3500, R:[14,12,-40], prop:{n:'mug',at:'R'}, emo:'calm'},
+    {dur:2000, R:[14,12,-40], prop:{n:'mug',at:'R'}, emo:'calm', face:{mo:0.2, mc:0.3}},
+    {dur:1500, R:[30,22,20],  prop:{n:'mug',at:'R'}, emo:'kind'}
+  ]},
+  read:    {n:'تقرأ كتاب', steps:[
+    {dur:6000, L:[-12,22,-25], R:[12,22,25], prop:{n:'book',at:'both'}, emo:'calm', face:{ly:0.6}, anim:'breathe'}
+  ]},
+  phone:   {n:'تتصفح الموبايل', steps:[
+    {dur:5000, R:[16,20,-15], prop:{n:'phone',at:'R'}, emo:'kind', face:{ly:0.5, mc:0.6}, anim:'tap'}
+  ]},
+  write:   {n:'تكتب بالقلم', steps:[
+    {dur:6000, R:[22,20,-35], prop:{n:'pencil',at:'R'}, emo:'think', face:{ly:0.6, lx:-0.3}, anim:'write'}
+  ]},
+  stretch: {n:'تتمطى', steps:[
+    {dur:3000, L:[-40,-28,-30], R:[40,-28,30], emo:'kind', face:{oL:0.5, oR:0.5}, anim:'breathe'}
+  ]},
+  scratch: {n:'تحك راسها', steps:[
+    {dur:3000, R:[18,-14,25], emo:'think', face:{br:0.2, bt:0.2}, anim:'scratch'}
+  ]},
+  wonder:  {n:'تتفرج حواليها', steps:[
+    {dur:4500, L:[-8,28,0], R:[8,28,0], emo:'surprised', face:{mo:0.1}, anim:'look'}
+  ]},
+  flower:  {n:'تشم وردة', steps:[
+    {dur:6000, R:[18,-4,-20], prop:{n:'flower',at:'R'}, emo:'kind', face:{oL:0.45, oR:0.45, mc:0.8}, anim:'breathe'}
+  ]},
+  juggle:  {n:'تلعب بكورة', steps:[
+    {dur:6000, L:[-30,10,-20], R:[30,15,20], prop:{n:'ball',at:'L'}, emo:'laugh', face:{mo:0.2}, anim:'juggle'}
+  ]},
+  kiss:    {n:'ترسل بوسة', steps:[
+    {dur:1500, R:[12,12,0], emo:'love', face:{oL:1, oR:0.1}},
+    {dur:2500, R:[48,-10,0], prop:{n:'heart',at:'R'}, emo:'love', face:{oL:1, oR:1}, hop:true}
+  ]},
+  yawn:    {n:'تتثاءب', steps:[
+    {dur:3000, R:[12,12,0], emo:'sleepy', face:{mo:0.6, mc:0}},
+    {dur:2000, R:[40,30,15], emo:'sleepy'}
+  ]},
+  dance:   {n:'ترقص', steps:[
+    {dur:5000, emo:'laugh', face:{mo:0.3}, anim:'dance', hop:true}
+  ]}
+};
+
+let actTimer = null, idleTimer = null, actActive = false;
+function applyStep(s){
+  setHandsRaw(s.L || REST.L, s.R || REST.R);
+  handAnim = s.anim || 'none';
+  setEmo(s.emo || 'calm');
+  if (s.face) Object.assign(tgt, s.face);
+  setProp(s.prop || null);
+  if (s.hop) hop();
+}
+function playAct(act){
+  clearTimeout(actTimer); actActive = true;
+  let i = 0;
+  const next = () => {
+    if (!actActive) return;
+    if (i >= act.steps.length){ endAct(); return; }
+    const s = act.steps[i++];
+    applyStep(s);
+    actTimer = setTimeout(next, s.dur);
+  };
+  next();
+}
+function endAct(){
+  actActive = false; clearTimeout(actTimer);
+  setProp(null); setHandsRaw(REST.L, REST.R); handAnim = 'none';
+  setEmo('calm');
+  scheduleIdle();
+}
+function stopActs(){
+  actActive = false; clearTimeout(actTimer); clearTimeout(idleTimer);
+  setProp(null); handAnim = 'none';
+}
+function scheduleIdle(){
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => {
+    if (talking || busy || (voiceOn && micRunning) || RM) { scheduleIdle(); return; }
+    const keys = Object.keys(ACTS);
+    playAct(ACTS[keys[Math.floor(Math.random() * keys.length)]]);
+  }, 5000 + Math.random() * 6000);
+}
+
+/* ---------- Counters ---------- */
+const counters = {msgs:0, changes:0, gemSum:0, gemN:0, lastGem:0, lastAudio:0, lastChunks:0};
+const setStat = t => { $('stat').textContent = t; };
+function renderCounters(){
+  const avg = counters.gemN ? (counters.gemSum / counters.gemN / 1000).toFixed(2) : '-';
+  $('counters').innerHTML =
+    `الرسائل: ${counters.msgs}<br>` +
+    `تغيّرات التعبير (مقطع): ${counters.changes}<br>` +
+    `متوسط زمن Gemini: ${avg} ث<br>` +
+    `آخر رد: ${counters.lastChunks} مقطع · الصوت: ${counters.lastAudio ? counters.lastAudio.toFixed(1)+' ث' : '-'}`;
+}
+renderCounters();
+
+/* ---------- Mouth shapes from ElevenLabs alignment ---------- */
+const VIS = {'ا':1,'أ':1,'إ':1,'آ':1,'ى':0.9,'ه':0.8,'ع':0.95,'ح':0.8,'و':0.5,'ؤ':0.5,'ي':0.55,'ئ':0.5,'ة':0.6,
+  'م':0,'ب':0,'ف':0.05,'\u064E':0.9,'\u064F':0.5,'\u0650':0.5,'\u0651':0.2,'\u0652':0.1,'\u064B':0.7,'\u064C':0.6,'\u064D':0.6,
+  'a':1,'e':0.7,'i':0.5,'o':0.8,'u':0.45,'m':0,'b':0,'p':0,'f':0.05};
+function visemeOpen(c){
+  if (/\s/.test(c) || /[.,!?؟،؛:;"'()\-]/.test(c)) return 0;
+  const k = VIS[c] !== undefined ? VIS[c] : VIS[c.toLowerCase()];
+  return k !== undefined ? k : 0.32;
+}
+let AL = null;
+function visemeAt(ct){
+  if (!AL) return 0;
+  for (let i = 0; i < AL.c.length; i++){
+    if (AL.s[i] <= ct && ct < AL.e[i] + 0.04) return visemeOpen(AL.c[i]);
+    if (AL.s[i] > ct) break;
+  }
+  return 0;
+}
+const oscillate = now => (Math.sin(now/85) + Math.sin(now/53 + 1) + 2) / 4 * 0.8;
+
+/* ---------- Text -> chunks ---------- */
+const validEmo = e => (e && EMO[e]) ? e : null;
+const validGest = g => (g && GEST[g]) ? g : null;
+const validMove = m => (m && MOVE[m]) ? m : null;
+function autoEmo(t){
+  if (/[؟?]/.test(t)) return 'think';
+  if (/(بطل|زعلت|غضبان|مزعج|كفاية|غلط)/.test(t)) return 'angry';
+  if (/(آسف|للأسف|حزين|زعلان|خسارة|خساره|وحشني|وحشتني)/.test(t)) return 'sad';
+  if (/(واو|يا سلام|معقول|ايه ده|إيه ده|مفاجأة|مفاجاة)/.test(t)) return 'surprised';
+  if (/(ههه|😂|😄)/.test(t)) return 'laugh';
+  if (/(بحبك|أحبك)/.test(t)) return 'love';
+  if (/(رائع|جامد|ممتاز|حلو|مبسوط|فرحان|😊)/.test(t)) return 'kind';
+  if (/!/.test(t)) return 'wave';
+  return 'calm';
+}
+function autoGest(t){
+  if (/[؟?]/.test(t)) return 'question';
+  if (/(^|\s)(أنا|انا|نفسي)(\s|$|[،,.!؟?])/.test(t)) return 'self';
+  if (/(مرحب|أهلا|اهلا|أهلاً|باي|سلام)/.test(t)) return 'wave';
+  if (/(كبير|صغير|ضخم|واسع|طويل)/.test(t)) return 'describe';
+  if (/(مش عارف|ما أعرف|ما اعرف)/.test(t)) return 'shrug';
+  if (/(هنا|هناك|ده|دي|هذا|هذه|انظر)/.test(t)) return 'point';
+  return 'none';
+}
+function splitSentences(text){
+  return (String(text).match(/[^.!?؟\n]+[.!?؟]*/g) || []).map(s => s.trim()).filter(Boolean);
+}
+const EMO_TAG_AR = {calm:'هدوء',kind:'لطف',angry:'غضب',sad:'حزن',surprised:'دهشة',think:'تفكير',wave:'ترحيب',laugh:'ضحك',cry:'بكاء',listen:'إنصات',sleepy:'نعاس',love:'حب'};
+const EMO_TAG_EN = {calm:'calm',kind:'warmly',angry:'angry',sad:'sad',surprised:'surprised',think:'thoughtful',wave:'cheerfully',laugh:'laughing',cry:'sad',listen:'calm',sleepy:'sleepy',love:'affectionate'};
+function inferVisual(given, text, emo, gesture){
+  if (['none','underline','circle','arrow','diagram','sparkle'].includes(given)) return given;
+  if (/(\d|\d+\s*(ذراع|متر|سم|سنتيمتر|عمود|طبقة|رغيف|سرج)|أولاً|ثانياً|ثالثاً|رابعاً|مقارنة|الفرق|يتكوّن|يتكون|يتكون من|يتكون من)/.test(text)) return 'diagram';
+  if (/(انظر|لاحظ|هنا|هناك|هذا|هذه|يده|يدها|اليد|على الجانب|في الجانب|أمام|خلف)/.test(text) || gesture==='point') return 'arrow';
+  if (/(مهم|أساسي|الخلاصة|تذكّر|تذكر|رائع|جميل)/.test(text)) return emo==='kind' || emo==='surprised' ? 'sparkle' : 'underline';
+  return 'none';
+}
+function inferAnchor(given, gesture, text){
+  if (['face','left','right','center','hand'].includes(given)) return given;
+  if (gesture==='point' || gesture==='describe') return 'hand';
+  if (/(وجه|عين|حاجب|تعبير|ابتسامة)/.test(text)) return 'face';
+  if (/(يمين|الجانب الأيمن|الجهة اليمنى)/.test(text)) return 'right';
+  if (/(يسار|الجانب الأيسر|الجهة اليسرى)/.test(text)) return 'left';
+  return 'center';
+}
+function inferLabel(given, text){
+  if (typeof given==='string' && given.trim()) return given.trim().slice(0,48);
+  const m = text.match(/\d+(?:[.,]\d+)?\s*(?:ذراعاً|ذراع|أذرع|متر|سم|سنتيمتر|عموداً|عمود|طبقات|طبقة|رغيفاً|رغيف|سرج)/);
+  if (m) return m[0];
+  if (/(مقارنة|الفرق)/.test(text)) return 'مقارنة';
+  if (/(يتكوّن|يتكون|طبقات)/.test(text)) return 'تفصيل بصري';
+  return '';
+}
+function toChunks(segs){
+  const out = [];
+  let previousEmotion = null;
+  segs.forEach(s => {
+    const text = String(s.text || '').trim();
+    if (!text) return;
+    const gesture = validGest(s.gesture) || autoGest(text);
+    const move = validMove(s.move);
+    const emo = validEmo(s.emotion) || autoEmo(text);
+    const head = (s.head === 'nod' || s.head === 'shake') ? s.head : null;
+    const words = text.split(/\s+/);
+    for (let k = 0; k < words.length; k += 3){
+      const startsEmotion = k === 0 && emo !== previousEmotion;
+      out.push({
+        text: words.slice(k, k + 3).join(' '),
+        emo, gesture,
+        tagAr: startsEmotion ? `[${EMO_TAG_AR[emo] || 'هدوء'}]` : '',
+        ttsPrefix: startsEmotion ? `[${EMO_TAG_EN[emo] || 'calm'}] ` : '',
+        move: k === 0 ? move : null,
+        head: k === 0 ? head : null,
+        visual: k === 0 ? inferVisual(s.visual, text, emo, gesture) : 'none',
+        anchor: k === 0 ? inferAnchor(s.anchor, gesture, text) : 'center',
+        label: k === 0 ? inferLabel(s.label, text) : ''
+      });
+      previousEmotion = emo;
+    }
+  });
+  return out;
+}
+const estMs = text => text.split(/\s+/).reduce((a, w) => a + 170 + Math.max(1, w.replace(/[^\u0600-\u06FFa-zA-Z0-9]/g,'').length) * 55 + 100, 0);
+
+/* ---------- Playback engine ---------- */
+const player = new Audio(); player.preload = 'auto';
+let playId = 0, timers = [], pollT = null, lastURL = null;
+let busy = false;
+
+let curOnDone = null, speechQ = [], qRunning = false, qEpoch = 0, streamCtl = null, bargeT = 0;
+function stopAll(){
+  playId++; curOnDone = null;
+  timers.forEach(clearTimeout); timers = [];
+  clearInterval(pollT); pollT = null;
+  player.onended = null; player.onloadedmetadata = null;
+  try{ player.pause(); }catch(e){}
+  try{ speechSynthesis.cancel(); }catch(e){}
+  lipFn = null; AL = null; talking = false;
+  stopActs();
+}
+
+function makeSvgEl(tag, attrs={}){
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+  return el;
+}
+function showKinetic(c, i){
+  bubble.replaceChildren(); bubble.style.display = 'block';
+  const W = $('stage').clientWidth, H = $('stage').clientHeight;
+  const svg = makeSvgEl('svg',{class:'kinetic-svg',viewBox:`0 0 ${W} ${H}`,preserveAspectRatio:'none','aria-hidden':'true'});
+  bubble.appendChild(svg);
+  // Place captions in varied safe zones around the avatar rather than inside a speech box.
+  const layouts = [
+    {x:.23,y:.28,tx:.50,ty:.43},{x:.76,y:.30,tx:.57,ty:.42},
+    {x:.25,y:.69,tx:.48,ty:.57},{x:.75,y:.68,tx:.54,ty:.56},
+    {x:.50,y:.23,tx:.50,ty:.39},{x:.50,y:.75,tx:.50,ty:.61}
+  ];
+  const layout = layouts[(i + (c.emo==='sad'?2:c.emo==='surprised'?4:0)) % layouts.length];
+  const x = Math.max(.18,Math.min(.82,layout.x + (c.anchor==='left' ? -.05 : c.anchor==='right' ? .05 : 0)));
+  const y = layout.y;
+  const target = c.anchor==='hand' ? (HPOS.R.x && HPOS.R.y ? HPOS.R : {x:W*.65,y:H*.56}) :
+    c.anchor==='left' ? {x:W*.34,y:H*.48} : c.anchor==='right' ? {x:W*.66,y:H*.48} :
+    c.anchor==='face' ? {x:W*.5,y:H*.40} : {x:W*layout.tx,y:H*layout.ty};
+  const sx = W*x, sy = H*y;
+  const line = makeSvgEl('path',{d:`M ${sx} ${sy+20} Q ${(sx+target.x)/2} ${(sy+target.y)/2-20} ${target.x} ${target.y}`,
+    fill:'none',stroke:'rgba(125,211,252,.72)','stroke-width':c.visual==='arrow'?2.2:1.2,'stroke-linecap':'round',opacity:c.visual==='none'?0:.9});
+  svg.appendChild(line);
+  if (c.visual==='arrow'){
+    const angle=Math.atan2(target.y-sy,target.x-sx), size=8;
+    svg.appendChild(makeSvgEl('path',{d:`M ${target.x} ${target.y} L ${target.x-size*Math.cos(angle-.55)} ${target.y-size*Math.sin(angle-.55)} M ${target.x} ${target.y} L ${target.x-size*Math.cos(angle+.55)} ${target.y-size*Math.sin(angle+.55)}`,fill:'none',stroke:'#7dd3fc','stroke-width':2,'stroke-linecap':'round'}));
+  }
+  if (c.visual==='circle' || c.visual==='diagram'){
+    svg.appendChild(makeSvgEl('circle',{cx:target.x,cy:target.y,r:c.visual==='diagram'?24:17,fill:'rgba(59,130,246,.07)',stroke:'#7dd3fc','stroke-width':1.5,'stroke-dasharray':c.visual==='diagram'?'3 4':'none'}));
+    if(c.visual==='diagram'){
+      svg.appendChild(makeSvgEl('path',{d:`M ${target.x-13} ${target.y} L ${target.x+13} ${target.y} M ${target.x} ${target.y-13} L ${target.x} ${target.y+13}`,stroke:'#60a5fa','stroke-width':1.4,'stroke-linecap':'round'}));
+    }
+  }
+  if (c.visual==='sparkle'){
+    [[target.x,target.y,7],[target.x+17,target.y-14,4],[target.x-16,target.y+13,3]].forEach(([cx,cy,r])=>svg.appendChild(makeSvgEl('path',{d:`M ${cx-r} ${cy} L ${cx+r} ${cy} M ${cx} ${cy-r} L ${cx} ${cy+r}`,stroke:'#a5f3fc','stroke-width':1.7,'stroke-linecap':'round'})));
+  }
+  svg.appendChild(makeSvgEl('circle',{cx:target.x,cy:target.y,r:2.7,fill:'#a5f3fc',opacity:.95}));
+  const copy=document.createElement('div'); copy.className='kinetic-copy'+(c.text.length>25?' small':'');
+  copy.style.left=(x*100)+'%'; copy.style.top=(y*100)+'%';
+  if(c.tagAr){const tag=document.createElement('span');tag.className='kinetic-tag';tag.textContent=c.tagAr;copy.appendChild(tag);}
+  const words=document.createElement('span');words.className='kinetic-words';
+  const parts=c.text.split(/(\s+)/); let wordNo=0;
+  parts.forEach(part=>{if(!part.trim()){words.appendChild(document.createTextNode(part));return;} const span=document.createElement('span'); if(wordNo===Math.max(0,Math.ceil(c.text.trim().split(/\s+/).length/2)-1)) span.className='accent'; span.textContent=part; words.appendChild(span); wordNo++;});
+  copy.appendChild(words);
+  bubble.appendChild(copy);
+  if(c.label && c.visual && c.visual!=='none'){
+    const note=document.createElement('div');note.className='kinetic-callout';note.textContent=c.label;
+    note.style.left=Math.max(12,Math.min(88,target.x/W*100))+'%';note.style.top=Math.max(12,Math.min(88,target.y/H*100+7))+'%';bubble.appendChild(note);
+  }
+  if(c.visual==='underline'){
+    const underline=makeSvgEl('path',{d:`M ${sx-45} ${sy+43} Q ${sx} ${sy+52} ${sx+45} ${sy+43}`,fill:'none',stroke:'#60a5fa','stroke-width':3,'stroke-linecap':'round'});svg.appendChild(underline);
+  }
+}
+function showChunk(chunks, i){
+  const c = chunks[i];
+  setEmo(c.emo, i % 2 === 1);
+  setGesture(c.gesture);
+  setProp(null);
+  if (c.move) setMove(c.move);
+  if (c.emo === 'laugh' || (c.emo === 'wave' && /!/.test(c.text))) hop();
+  counters.changes++;
+  if (c.head){ headMood = c.head; headUntil = performance.now() + 900; }
+  showKinetic(c, i);
+}
+
+function finish(id, chunks){
+  if (id !== playId) return;
+  lipFn = null; talking = false; AL = null;
+  counters.lastChunks = chunks.length;
+  renderCounters();
+  idleWanderAt = performance.now() + 3000;
+  timers.push(setTimeout(() => { if (id === playId){ setEmo('calm'); setGesture('none'); } }, 1200));
+  timers.push(setTimeout(() => { if (id === playId) { bubble.style.display = 'none'; bubble.replaceChildren(); } }, 900));
+  scheduleIdle();
+  if (voiceOn){ setVoiceLabel('أسمعك… تكلّم الآن'); queueMicRestart(500); }
+  const cb = curOnDone; curOnDone = null; if (cb) cb();
+}
+
+function runChunks(chunks, opts = {}){
+  stopAll();
+  curOnDone = opts.onDone || null;
+  const id = playId;
+  if (!chunks.length) return;
+  talking = true;
+  const starts = []; let pos = 0;
+  chunks.forEach(c => { starts.push(pos); pos += c.text.length + 1; });
+  const audioStarts = []; let audioPos = 0;
+  chunks.forEach(c => { const pl = opts.useTags ? (c.ttsPrefix || '').length : 0; audioStarts.push(audioPos + pl); audioPos += pl + c.text.length + 1; });
+  const full = chunks.map(c => c.text).join(' ');
+  let cur = -1;
+  const go = i => {
+    if (id !== playId || i === cur || i < 0 || i >= chunks.length) return;
+    cur = i; showChunk(chunks, i);
+  };
+
+  // 1) ElevenLabs audio: chunks switch at the exact time of their first character
+  if (opts.audioUrl && opts.alignment){
+    const al = opts.alignment;
+    AL = {c: al.characters, s: al.character_start_times_seconds, e: al.character_end_times_seconds};
+    const at = audioStarts.map(p => AL.s[Math.min(p, AL.s.length - 1)]);
+    lipFn = () => visemeAt(player.currentTime) * (0.85 + 0.15 * Math.sin(performance.now() / 70));
+    if (lastURL) URL.revokeObjectURL(lastURL);
+    lastURL = opts.audioUrl;
+    player.src = opts.audioUrl;
+    player.onloadedmetadata = () => {
+      counters.lastAudio = player.duration; renderCounters();
+      setStat(`Gemini ${(counters.lastGem/1000).toFixed(1)}ث · الصوت ${player.duration.toFixed(1)}ث`);
+    };
+    player.onended = () => { clearInterval(pollT); finish(id, chunks); };
+    pollT = setInterval(() => {
+      const ct = player.currentTime;
+      let i = 0; while (i + 1 < at.length && at[i + 1] <= ct + 0.05) i++;
+      go(i);
+    }, 50);
+    player.play().catch(() => {
+      if (id !== playId) return;
+      stopAll(); runChunks(chunks, {speak: voiceOn, onDone: opts.onDone});
+    });
+    return;
+  }
+
+  // 2) Browser voice: word boundaries drive the chunks; estimated timers are the fallback
+  const canSpeak = opts.speak && 'speechSynthesis' in window;
+  let acc = 0, gotBoundary = false;
+  chunks.forEach((c, i) => {
+    timers.push(setTimeout(() => { if (!gotBoundary) go(i); }, acc));
+    acc += estMs(c.text);
+  });
+  if (canSpeak){
+    const u = new SpeechSynthesisUtterance(full);
+    u.lang = 'ar-EG'; u.rate = 0.94; u.pitch = 1.04; u.volume = 1;
+    // Android may populate its voice list asynchronously; select an Arabic voice when available.
+    const chooseArabicVoice = () => {
+      const voices = speechSynthesis.getVoices();
+      const v = voices.find(v => /^ar(-|$)/i.test(v.lang)) || voices.find(v => /arab/i.test(v.name));
+      if (v) u.voice = v;
+    };
+    chooseArabicVoice();
+    u.onstart = () => { if (voiceOn) setVoiceLabel('أتحدث إليك…'); };
+    u.onboundary = e => {
+      if (id !== playId) return;
+      gotBoundary = true;
+      let i = 0; while (i + 1 < starts.length && starts[i + 1] <= e.charIndex) i++;
+      go(i);
+    };
+    u.onend = () => finish(id, chunks);
+    u.onerror = e => {
+      if (id !== playId) return;
+      setStat('تعذر تشغيل صوت المتصفح: ' + (e.error || 'خطأ صوتي'));
+      finish(id, chunks);
+    };
+    lipFn = oscillate;
+    try { speechSynthesis.cancel(); speechSynthesis.resume(); speechSynthesis.speak(u); }
+    catch(e) { setStat('تعذر تشغيل صوت المتصفح'); finish(id, chunks); }
+    // Some Android WebViews never fire onend; don't leave voice mode stuck forever.
+    timers.push(setTimeout(() => { if (id === playId && talking) finish(id, chunks); }, Math.max(8000, acc + 9000)));
+  } else {
+    lipFn = oscillate;
+    if (voiceOn) setVoiceLabel('هذا المتصفح لا يدعم إخراج الصوت');
+    timers.push(setTimeout(() => finish(id, chunks), acc + 500));
+  }
+}
+
+/* ---------- ElevenLabs ---------- */
+const elKey = () => $('elkey').value.trim();
+
+const TRAITS = {
+  nova:{e:1,bl:[2200,5000]}, pixel:{e:1.5,bl:[1200,3200]}, zeyo:{e:0.6,bl:[3500,7000]},
+  luma:{e:0.7,bl:[2500,5500]}, radar:{e:1.6,bl:[1000,3000]}, miko:{e:1.3,bl:[1500,4000]},
+  siro:{e:0.8,bl:[2500,4500]}, aura:{e:0.7,bl:[3000,6000]}, kobi:{e:1.1,bl:[1800,4200]},
+  nebula:{e:0.5,bl:[4000,8000]}
+};
+function loadHist(id){ try{ return JSON.parse(localStorage.getItem('face-hist-' + id) || '[]'); }catch(e){ return []; } }
+const proxyURL = () => ($('proxy').value || '').trim().replace(/\/+$/, '');
+
+async function tts(text){
+  const proxy = proxyURL(), vid = $('evoice').value || 'JBFqnCBsd6RMkjVDRZzb', model = $('emodel').value;
+  let r;
+  if (proxy){
+    r = await fetch(proxy + '/tts', {method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({text, voice: vid, model})});
+  } else {
+    r = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + encodeURIComponent(vid) + '/with-timestamps', {
+      method: 'POST', headers: {'Content-Type': 'application/json', 'xi-api-key': elKey()},
+      body: JSON.stringify({text, model_id: model})});
+  }
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok){ const m = d.detail && (d.detail.message || (typeof d.detail === 'string' ? d.detail : '')); throw new Error('ElevenLabs: ' + (m || r.status)); }
+  return d;
+}
+
+// Audio for one segment; null when no voice is configured or the request fails.
+async function fetchAudio(chunks){
+  if (!elKey() && !proxyURL()) return null;
+  const useTags = $('emodel').value === 'eleven_v3';
+  const text = chunks.map(c => (useTags ? (c.ttsPrefix || '') : '') + c.text).join(' ');
+  try{
+    const d = await tts(text);
+    const al = d.alignment || d.normalized_alignment;
+    if (!al || !d.audio_base64) return null;
+    const bin = atob(d.audio_base64), u8 = new Uint8Array(bin.length);
+    for (let k = 0; k < bin.length; k++) u8[k] = bin.charCodeAt(k);
+    return {url: URL.createObjectURL(new Blob([u8], {type: 'audio/mpeg'})), al, useTags};
+  }catch(e){ setStat('تعذر الصوت: ' + e.message + ' (بدون صوت)'); return null; }
+}
+
+// Speech queue: each segment starts its TTS request immediately and plays in order.
+function stopSpeech(){
+  qEpoch++; speechQ = []; qRunning = false;
+  if (streamCtl){ try{ streamCtl.abort(); }catch(e){} streamCtl = null; }
+  stopAll();
+}
+function enqueueSpeech(chunks){
+  speechQ.push({chunks, p: fetchAudio(chunks)});
+  if (!qRunning) playNext(qEpoch);
+}
+async function playNext(epoch){
+  if (epoch !== qEpoch) return;
+  const item = speechQ.shift();
+  if (!item){ qRunning = false; return; }
+  qRunning = true;
+  const aud = await item.p;
+  if (epoch !== qEpoch) return;
+  const onDone = () => { if (epoch === qEpoch) playNext(epoch); };
+  if (aud) runChunks(item.chunks, {audioUrl: aud.url, alignment: aud.al, useTags: aud.useTags, onDone});
+  else runChunks(item.chunks, {speak: voiceOn, onDone});
+}
+
+// Voice barge-in: the user talks loudly while she talks, so she stops and listens.
+function bargeIn(){ stopSpeech(); busy = false; setVoiceLabel('أسمعك… تكلّم الآن'); queueMicRestart(150); }
+
+// One streamed line is one JSON segment; anything else is ignored.
+function parseLine(ln){
+  const s = ln.trim().replace(/^```(json)?/, '').replace(/```$/, '').replace(/^[\[,]+/, '').replace(/[\],]+$/, '').trim();
+  if (!s.startsWith('{') || !s.endsWith('}')) return null;
+  try{ const o = JSON.parse(s); return (o && typeof o.text === 'string') ? o : null; }catch(e){ return null; }
+}
+$('ldv').onclick = async () => {
+  const k = elKey(); if (!k){ setStat('الصق مفتاح ElevenLabs أولاً'); return; }
+  try{
+    const r = await fetch('https://api.elevenlabs.io/v1/voices', {headers: {'xi-api-key': k}});
+    const d = await r.json(); if (!r.ok) throw new Error((d.detail && d.detail.message) || r.status);
+    $('evoice').innerHTML = d.voices.map(v => `<option value="${v.voice_id}">${v.name}</option>`).join('');
+    setStat('تم تحميل ' + d.voices.length + ' صوت');
+  }catch(e){ setStat('تعذر تحميل الأصوات: ' + e.message); }
+};
+
+async function speakReply(chunks){
+  const full = chunks.map(c => c.text).join(' ');
+  if (elKey()){
+    try{
+      const useAudioTags = $('emodel').value === 'eleven_v3';
+      const ttsText = chunks.map(c => `${useAudioTags ? (c.ttsPrefix || '') : ''}${c.text}`).join(' ');
+      const d = await tts(ttsText);
+      const al = d.alignment || d.normalized_alignment;
+      if (al && d.audio_base64){
+        const bin = atob(d.audio_base64), u8 = new Uint8Array(bin.length);
+        for (let k = 0; k < bin.length; k++) u8[k] = bin.charCodeAt(k);
+        const url = URL.createObjectURL(new Blob([u8], {type: 'audio/mpeg'}));
+        runChunks(chunks, {audioUrl: url, alignment: al});
+        return;
+      }
+    }catch(e){ setStat('تعذر الصوت: ' + e.message + ' (بدون صوت)'); }
+  }
+  runChunks(chunks, {speak: voiceOn});
+}
+
+/* ---------- Gemini ---------- */
+/* ---------- Characters: appearance + personality ---------- */
+const CHARS = [
+  {id:'nova', name:'نوفا', tag:'ودودة ومتوازنة', hello:'أهلاً، أنا نوفا. تحب نبدأ؟',
+   persona:'شخصيتك نوفا: ودودة ومتوازنة، تتكلمين بلطف وبشكل واضح وبسيط.',
+   theme:{shape:'round', eye:['#ffffff','#e0f2fe','#7dd3fc'], rim:'#ffffff', glow:'#60a5fa', brow:['#ffffff','#dce8f4'], mouth:'#ffffff', hand:{fill:'#eef4ff', stroke:'#7b6cff'}}},
+  {id:'pixel', name:'بيكسل', tag:'مرحة وخفيفة الدم', hello:'هاي! أنا بيكسل، جاهز للمرح!',
+   persona:'شخصيتك بيكسل: مرحة وخفيفة الدم، تحبين المزاح والتعليقات الظريفة.',
+   theme:{shape:'square', eye:['#f0fff8','#a7f3d0','#34d399'], rim:'#a7f3d0', glow:'#34d399', brow:['#d1fae5','#6ee7b7'], mouth:'#6ee7b7', hand:{fill:'#ecfdf5', stroke:'#059669'}}},
+  {id:'zeyo', name:'زيّو', tag:'حكيم وهادئ', hello:'مرحباً، أنا زيّو. تفضّل، أنا سامعك.',
+   persona:'شخصيتك زيّو: حكيم وهادئ، تتكلم ببطء وتقدم نصائح لطيفة قصيرة.',
+   theme:{shape:'visor', eye:['#fff7ed','#fcd34d','#b45309'], rim:'#fde68a', glow:'#f59e0b', brow:['#fde68a','#d97706'], mouth:'#fcd34d', hand:{fill:'#fef3c7', stroke:'#92400e'}}},
+  {id:'luma', name:'لوما', tag:'خجولة ولطيفة', hello:'أهلاً... أنا لوما. يسعدني وجودك.',
+   persona:'شخصيتك لوما: خجولة ولطيفة، جمل قصيرة ومهذبة، وتحبين تشجعين المستخدم.',
+   theme:{shape:'round', eye:['#fff1f7','#fbcfe8','#f472b6'], rim:'#fbcfe8', glow:'#f472b6', brow:['#fce7f3','#f9a8d4'], mouth:'#f9a8d4', hand:{fill:'#fdf2f8', stroke:'#be185d'}}},
+  {id:'radar', name:'رادار', tag:'حماسي ونشيط', hello:'يلا بينا! أنا رادار، جاهز للتحدي!',
+   persona:'شخصيتك رادار: حماسية ونشيطة، تحبين الرياضة والتحدي والتشجيع بقوة.',
+   theme:{shape:'visor', eye:['#fff7ed','#fdba74','#ea580c'], rim:'#fed7aa', glow:'#f97316', brow:['#fed7aa','#fb923c'], mouth:'#fdba74', hand:{fill:'#fff7ed', stroke:'#c2410c'}}},
+  {id:'miko', name:'ميكو', tag:'فضولي كطفل لطيف', hello:'مرحبا! أنا ميكو! تعرف إيه الجديد؟',
+   persona:'شخصيتك ميكو: فضولية كطفلة لطيفة، تسألين أسئلة كثيرة وتتعجبين بسهولة.',
+   theme:{shape:'round', eye:['#ffffff','#fef9c3','#fde047'], rim:'#fef08a', glow:'#facc15', brow:['#fefce8','#fde047'], mouth:'#fde047', hand:{fill:'#fefce8', stroke:'#a16207'}}},
+  {id:'siro', name:'سيرو', tag:'مساعد محترف ودقيق', hello:'مساء الخير. أنا سيرو، كيف أساعدك؟',
+   persona:'شخصيتك سيرو: مساعدة محترفة ودقيقة، تشرحين بوضوح ومنظم بدون زيادة.',
+   theme:{shape:'square', eye:['#f8fafc','#cbd5e1','#64748b'], rim:'#e2e8f0', glow:'#22d3ee', brow:['#e0f2fe','#67e8f9'], mouth:'#67e8f9', hand:{fill:'#f1f5f9', stroke:'#0e7490'}}},
+  {id:'aura', name:'أورا', tag:'شاعرية وحالمة', hello:'أهلاً بيك... أنا أورا، خليني أسمعك.',
+   persona:'شخصيتك أورا: شاعرية وحالمة، تتكلمين بعبارات دافئة ورقيقة.',
+   theme:{shape:'round', eye:['#faf5ff','#e9d5ff','#a855f7'], rim:'#e9d5ff', glow:'#c084fc', brow:['#f3e8ff','#d8b4fe'], mouth:'#e9d5ff', hand:{fill:'#faf5ff', stroke:'#7e22ce'}}},
+  {id:'kobi', name:'كوبي', tag:'ساخرة بخفة وذكية', hello:'أهلاً! أنا كوبي، بس ما تصدّقش كل اللي أقوله.',
+   persona:'شخصيتك كوبي: ساخرة بخفة وذكية، مزاحك لطيف ولا تجرحين أحداً.',
+   theme:{shape:'visor', eye:['#ecfeff','#99f6e4','#0f766e'], rim:'#99f6e4', glow:'#2dd4bf', brow:['#ccfbf1','#5eead4'], mouth:'#5eead4', hand:{fill:'#f0fdfa', stroke:'#115e59'}}},
+  {id:'nebula', name:'نيبولا', tag:'غامضة مثل الفضاء', hello:'من بعيد في الفضا... أنا نيبولا. قولي.',
+   persona:'شخصيتك نيبولا: غامضة وهادئة كالفضاء، تتكلمين بتأمل وتشبيهات عن النجوم.',
+   theme:{shape:'dot', eye:['#f5f3ff','#a78bfa','#4c1d95'], rim:'#c4b5fd', glow:'#8b5cf6', brow:['#ddd6fe','#8b5cf6'], mouth:'#c4b5fd', hand:{fill:'#ede9fe', stroke:'#4c1d95'}}}
+];
+let CH = CHARS[0];
+
+const SYS = 'أنت شخصية روبوت لطيفة تتحدث مع المستخدم بالعربية بلهجة مصرية بسيطة. لديك وجه تعبيري بحواجب وعينين وفم، ويدان طائرتان، وجسم يتحرك في الشاشة. أجيبي بما لا يزيد عن 25 كلمة. قسّمي ردك إلى مقاطع، كل مقطع لا يزيد عن 3 كلمات، وأنهي المقطع عند نهاية كل جملة. لكل مقطع حددي: emotion من (calm, kind, angry, sad, surprised, think, wave, laugh, cry, listen, sleepy, love)، و gesture من (none, wave, point, self, describe, question, shrug, clap)، و move من (none, center, left, right, up, down)، و head من (none, nod, shake). أخرجي كل مقطع في سطر مستقل كـ JSON واحد، بدون مصفوفة ولا أقواس خارجية ولا أي نص آخر، بهذا الشكل: {"text":"...","emotion":"...","gesture":"...","move":"none","head":"none"}. اختاري emotion بدقة حسب معنى الكلام كي يظهر وسم عربي بين أقواس مربعة مثل [حزن] أو [هدوء] أو [دهشة] على الشاشة، ويُرسل وسم صوتي مناسب إلى ElevenLabs عند تغيّر الشعور. لا تضعي الوسوم داخل text نفسه ولا تجعلي الشخصية تنطق اسم التعبير. أضيفي لكل مقطع حقول visual و anchor و label: visual واحد من (none, underline, circle, arrow, diagram, sparkle)، وanchor واحد من (face, left, right, center, hand)، وlabel عبارة قصيرة اختيارية لا تتجاوز 4 كلمات لتوضيح الفكرة. استخدمي الرسم التوضيحي أحياناً فقط عندما يضيف معنى، خصوصاً مع الأرقام أو المقارنات أو الإشارة لشيء؛ لا تضعي رسماً في كل مقطع. اجعلي النص المرئي مثل مونتاج سينمائي: كلمات كبيرة متدرجة تظهر في مواضع متغيرة حول الشخصية بلا مربع أو خلفية نصية، مع خط أو سهم أو دائرة عند الحاجة. عند شرح معلومة، اختاري visual=diagram أو circle وأضيفي label موجزاً، وعند الإشارة لليد اختاري anchor=hand وvisual=arrow. مثال لرد على مرحباً كيف حالك (كل سطر مقطع مستقل):\n{"text":"أهلاً بيك","emotion":"wave","gesture":"wave","move":"none","head":"nod"}\n{"text":"أنا بخير","emotion":"kind","gesture":"self","move":"none","head":"none"}\n{"text":"وإنت كيف حالك؟","emotion":"think","gesture":"question","move":"right","head":"none"}';
+let hist = loadHist(CH.id);
+function saveHist(){ try{ localStorage.setItem('face-hist-' + CH.id, JSON.stringify(hist.slice(-40))); }catch(e){} }
+let thinkOK = true;
+
+async function askAIStream(userText, onSegment){
+  const proxy = proxyURL(), key = $('key').value.trim();
+  if (!proxy && !key) throw new Error('حط رابط الخادم أو مفتاح Gemini من ⚙️ الإعدادات');
+  const model = $('mdl').value.trim() || 'gemini-3.8-flash';
+  hist.push({role: 'user', parts: [{text: userText}]});
+  const body = JSON.stringify({systemInstruction: {parts: [{text: SYS + ' ' + CH.persona}]}, contents: hist.slice(-30), generationConfig: {maxOutputTokens: 1024}});
+  const headers = {'Content-Type': 'application/json'};
+  let url;
+  if (proxy) url = proxy + '/gemini?model=' + encodeURIComponent(model);
+  else {
+    url = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':streamGenerateContent?alt=sse';
+    headers['x-goog-api-key'] = key;
+  }
+  streamCtl = new AbortController();
+  let r;
+  try{ r = await fetch(url, {method: 'POST', headers, body, signal: streamCtl.signal}); }
+  catch(e){ hist.pop(); streamCtl = null; if (e.name === 'AbortError') throw e; throw new Error('تعذر الاتصال بالخادم'); }
+  if (!r.ok){ hist.pop(); streamCtl = null; const d = await r.json().catch(() => ({})); throw new Error((d.error && (d.error.message || d.error)) || ('خطأ ' + r.status)); }
+  const reader = r.body.getReader(), dec = new TextDecoder();
+  let sse = '', full = '', lines = '';
+  const emit = ln => { const seg = parseLine(ln); if (seg) onSegment(seg); };
+  while (true){
+    const {value, done} = await reader.read(); if (done) break;
+    sse += dec.decode(value, {stream: true});
+    let i;
+    while ((i = sse.indexOf('\n')) >= 0){
+      const line = sse.slice(0, i).trim(); sse = sse.slice(i + 1);
+      if (!line.startsWith('data:')) continue;
+      const data = line.slice(5).trim(); if (!data || data === '[DONE]') continue;
+      let j; try{ j = JSON.parse(data); }catch(e){ continue; }
+      const parts = (j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || [];
+      for (const p of parts){
+        if (!p.text) continue;
+        full += p.text; lines += p.text;
+        let k; while ((k = lines.indexOf('\n')) >= 0){ emit(lines.slice(0, k)); lines = lines.slice(k + 1); }
+      }
+    }
+  }
+  if (lines.trim()) emit(lines);
+  streamCtl = null;
+  if (full.trim()){ hist.push({role: 'model', parts: [{text: full}]}); saveHist(); }
+  else hist.pop();
+  return full;
+}
+function parseWhole(raw){
+  try{ return JSON.parse(raw.replace(/^```json|```$/g, '').trim()); }catch(e){ return {text: raw}; }
+}
+
+/* ---------- Send flow ---------- */
+const send = async () => {
+  const t = txt.value.trim(); if (!t || busy) return;
+  txt.value = ''; busy = true; stopSpeech(); $('panel').classList.remove('open');
+  setEmo('think'); setGesture('none'); counters.msgs++; setStat('...');
+  const t0 = performance.now(); let got = 0;
+  try{
+    const full = await askAIStream(t, seg => {
+      const ch = toChunks([seg]); if (!ch.length) return;
+      if (!got){ counters.lastGem = performance.now() - t0; setStat('Gemini ' + (counters.lastGem / 1000).toFixed(1) + 'ث · يتكلم...'); }
+      got++; enqueueSpeech(ch);
+    });
+    if (!got){
+      counters.lastGem = performance.now() - t0;
+      const o = parseWhole(full);
+      const segs = (Array.isArray(o.segments) && o.segments.length) ? o.segments : splitSentences(o.text || full).map(x => ({text: x}));
+      let n = 0;
+      segs.forEach(seg => { const ch = toChunks([seg]); if (ch.length){ n++; enqueueSpeech(ch); } });
+      if (!n) throw new Error('رد فارغ');
+    }
+    counters.gemSum += counters.lastGem; counters.gemN++;
+  }catch(e){
+    if (e.name !== 'AbortError'){
+      setStat(e.message.slice(0, 140));
+      enqueueSpeech(toChunks([{text: e.message.slice(0, 80), emotion: 'sad', gesture: 'none'}]));
+    }
+  }
+  busy = false;
+  renderCounters();
+};
+$('send').onclick = send;
+txt.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+
+/* ---------- Touch interaction: playful, automatic, invisible prompt flow ---------- */
+let touchStart = null, lastTouchAt = 0, touchBurst = 0, touchBusy = false;
+const touchReplies = {
+  tickle: {emo:'laugh', gesture:'shrug', anim:'dance', words:['ههههه! كفاية دغدغة!','آآآه ههههه! مش قادر!','إنت بتدغدغني بجد؟ ههههه!']},
+  pet:    {emo:'love', gesture:'self', anim:'breathe', words:['ممم… دي لمسة لطيفة.','يا سلام، حنية!','حسّيت بالاهتمام ده.']},
+  tap:    {emo:'surprised', gesture:'wave', anim:'sway', words:['أيوه؟ ناديتني؟','أوه! حسّيت بلمستك!','أنا هنا! إيه الحكاية؟']},
+  stroke: {emo:'kind', gesture:'describe', anim:'breathe', words:['أوووه، بتطبطب عليّ؟','دي حركة لطيفة أوي.','حسّها زي الطبطبة!']}
+};
+function touchRipple(x,y){
+  const el=document.createElement('i'); el.className='touch-ripple'; el.style.left=x+'px'; el.style.top=y+'px'; bubble.appendChild(el); bubble.style.display='block';
+  setTimeout(()=>el.remove(),750);
+}
+function facePoint(ev){
+  const svg=$('avatar'), pt=svg.createSVGPoint(); pt.x=ev.clientX; pt.y=ev.clientY;
+  const p=pt.matrixTransform(svg.getScreenCTM().inverse());
+  return {x:p.x,y:p.y,screenX:ev.clientX,screenY:ev.clientY};
+}
+function chooseTouch(a,b,duration,now){
+  const quick = now-lastTouchAt < 650;
+  touchBurst = quick ? touchBurst+1 : 1; lastTouchAt=now;
+  if (touchBurst>=2) return 'tickle';
+  if (duration>520) return 'pet';
+  if (b && Math.hypot(b.screenX-a.screenX,b.screenY-a.screenY)>24) return 'stroke';
+  if (a && Math.abs(a.x)>75 && a.y>-100 && a.y<70) return 'tickle';
+  return 'tap';
+}
+function localTouchReaction(kind,point){
+  const r=touchReplies[kind]||touchReplies.tap;
+  stopActs(); setEmo(r.emo); setGesture(r.gesture); handAnim=r.anim;
+  headMood=kind==='tickle'?'shake':'nod'; headUntil=performance.now()+(kind==='tickle'?900:550);
+  if(kind==='tickle'){hop(); setHandsRaw([-22,-4,-35],[22,-4,35]);}
+  else if(kind==='pet'){setHandsRaw([-24,-8,-20],[24,-8,20]);}
+  else if(kind==='stroke'){setHandsRaw([-34,4,-25],[34,4,25]);}
+  else {setHandsRaw(REST.L,[32,-12,48]);}
+  const phrase=r.words[Math.floor(Math.random()*r.words.length)];
+  bubble.replaceChildren(); bubble.style.display='block';
+  if(point) touchRipple(point.screenX,point.screenY);
+  const cap=document.createElement('div'); cap.className='kinetic-copy'; cap.style.left='50%'; cap.style.top='24%';
+  const words=document.createElement('span'); words.className='kinetic-words'; words.textContent=phrase;
+  cap.appendChild(words); bubble.appendChild(cap);
+  setTimeout(()=>{ if(!busy) { bubble.style.display='none'; bubble.replaceChildren(); } },1200);
+}
+function sendTouchToAI(kind){
+  if (touchBusy || busy) return;
+  touchBusy=true;
+  const descriptions={tickle:'المستخدم يدغدغك. اضحكي بعفوية، تحركي بتلقائية، حاولي إبعاد اليدين قليلًا وقولي ردًا قصيرًا مرحًا باللهجة المصرية.',pet:'المستخدم يربت عليك بلطف. أظهري الراحة والامتنان بتعبير حنون ورد قصير.',tap:'المستخدم لمس وجهك لمسة خفيفة ليناديك. تفاجئي قليلًا ثم اسأليه بلطف ماذا يريد.',stroke:'المستخدم مرر إصبعه على وجهك كأنه يطبطب عليك. تفاعلي بلطف وهدوء وردّي بعفوية.'};
+  // The prompt is sent directly; no technical instructions are shown in the UI.
+  txt.value='[تفاعل لمس] '+descriptions[kind];
+  send().finally(()=>{touchBusy=false;});
+}
+const avatarEl=$('avatar');
+avatarEl.addEventListener('pointerdown',e=>{
+  if(e.button!==undefined && e.button!==0) return;
+  touchStart={point:facePoint(e),time:performance.now(),pointerId:e.pointerId};
+  try{avatarEl.setPointerCapture(e.pointerId);}catch(_){ }
+});
+avatarEl.addEventListener('pointerup',e=>{
+  if(!touchStart || (touchStart.pointerId!==undefined && e.pointerId!==touchStart.pointerId)) return;
+  const end=facePoint(e), start=touchStart.point, duration=performance.now()-touchStart.time;
+  touchStart=null;
+  const kind=chooseTouch(start,end,duration,performance.now());
+  localTouchReaction(kind,end);
+  // Briefly let the immediate reaction read before Gemini takes over.
+  setTimeout(()=>sendTouchToAI(kind),320);
+});
+avatarEl.addEventListener('pointercancel',()=>{touchStart=null;});
+
+
+/* ---------- Voice conversation + mic level ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let voiceOn = false, rec = null, micRunning = false, restartMicTimer = null;
+function voiceErrorMessage(code){
+  const map={ 'not-allowed':'إذن الميكروفون مرفوض. افتح إعدادات الموقع واسمح بالميكروفون.',
+    'service-not-allowed':'خدمة التعرف على الكلام محظورة في هذا المتصفح.',
+    'audio-capture':'لم يتم العثور على ميكروفون يعمل.',
+    'no-speech':'لم أسمع كلامًا. قرّب الهاتف وتحدث مرة أخرى.',
+    'network':'تعذر الاتصال بخدمة تحويل الكلام إلى نص. تحقق من الإنترنت وجرّب Chrome.',
+    'aborted':'تم إيقاف الاستماع.', 'language-not-supported':'خدمة التعرف لا تدعم اللغة العربية هنا.' };
+  return map[code] || ('تعذر الاستماع ('+code+'). جرّب Chrome وتأكد من الإنترنت.');
+}
+function queueMicRestart(delay=650){
+  clearTimeout(restartMicTimer);
+  if(voiceOn) restartMicTimer=setTimeout(()=>{ if(voiceOn && !busy && !talking && !micRunning) startMic(); },delay);
+}
+function startMic(){
+  if (!voiceOn || !SR || micRunning || busy || talking) return;
+  try{
+    if(!rec){
+      rec = new SR(); rec.lang = 'ar-EG'; rec.continuous = false; rec.interimResults = true; rec.maxAlternatives = 1;
+      rec.onstart = () => { micRunning = true; micBtn.classList.add('rec'); setVoiceLabel('أسمعك… تكلّم الآن'); setStat(''); stopActs(); applyStep({emo:'listen', anim:'none'}); };
+      rec.onresult = e => {
+        let fin = '', inter = '';
+        for (let i = e.resultIndex; i < e.results.length; i++){
+          const rr = e.results[i];
+          if (rr.isFinal) fin += rr[0].transcript; else inter += rr[0].transcript;
+        }
+        if(fin.trim()){
+          const heard=fin.trim(); txt.value=heard; setVoiceLabel('سمعتك: «'+heard+'»'); setStat('');
+          try{ rec.stop(); }catch(_){}
+          setTimeout(()=>{ if(voiceOn && !busy && !talking) send(); },120);
+        } else if(inter.trim()) setVoiceLabel('أسمعك: '+inter.trim());
+      };
+      rec.onerror = e => {
+        micRunning=false; micBtn.classList.remove('rec');
+        setVoiceLabel(voiceErrorMessage(e.error));
+        if(e.error==='not-allowed' || e.error==='service-not-allowed'){
+          setStat('اسمح بالميكروفون من إعدادات الموقع.');
+          voiceOn=false; micBtn.classList.remove('on');
+        } else if(voiceOn && e.error!=='aborted') queueMicRestart(1200);
+      };
+      rec.onend = () => {
+        micRunning = false; micBtn.classList.remove('rec');
+        if(voiceOn && !busy && !talking) { setVoiceLabel('أسمعك… تكلّم الآن'); queueMicRestart(500); }
+      };
+    }
+    rec.start();
+  }catch(e){
+    micRunning=false;
+    setVoiceLabel('لم يبدأ الاستماع. اضغط الميكروفون مرة أخرى.');
+    setStat('خطأ تشغيل الميكروفون: '+(e.message||'تعذر البدء'));
+  }
+}
+if (!SR){ micBtn.title = 'التعرف على الكلام غير مدعوم هنا؛ افتح الملف في Google Chrome'; }
+
+let aStream = null, aCtx = null, levelRAF = null;
+async function startLevel(){
+  if (aStream) return true;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    setStat('المتصفح لم يوفّر طلب إذن الميكروفون. افتح الصفحة عبر HTTPS في Chrome؛ الملفات المحلية وبعض عوارض HTML تمنع الوصول للميكروفون.');
+    return false;
+  }
+  try{
+    aStream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+    aCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(aCtx.state==='suspended') await aCtx.resume();
+    const node = aCtx.createAnalyser(); node.fftSize = 512;
+    aCtx.createMediaStreamSource(aStream).connect(node);
+    const buf = new Uint8Array(node.fftSize);
+    const loop = () => {
+      if(!aCtx || !aStream) return;
+      node.getByteTimeDomainData(buf);
+      let sum = 0; for (const v of buf){ const x = (v - 128) / 128; sum += x * x; }
+      const lvl = Math.min(1, Math.sqrt(sum / buf.length) * 7).toFixed(3);
+      micBtn.style.setProperty('--lvl', lvl); const orb = $('voiceOrb'); if (orb) orb.style.setProperty('--lvl', lvl);
+      if (talking && voiceOn && Number(lvl) > 0.3){ if (!bargeT) bargeT = performance.now(); if (performance.now() - bargeT > 300){ bargeT = 0; bargeIn(); } } else bargeT = 0;
+      levelRAF = requestAnimationFrame(loop);
+    };
+    loop(); return true;
+  }catch(e){ setStat('تعذر الوصول للميكروفون: '+(e.message||'تحقق من الإذن')); return false; }
+}
+function stopLevel(){
+  if (levelRAF) cancelAnimationFrame(levelRAF); levelRAF = null;
+  if (aStream) aStream.getTracks().forEach(t => t.stop()); aStream = null;
+  if (aCtx) aCtx.close(); aCtx = null;
+  micBtn.style.setProperty('--lvl', 0);
+}
+const voicePanel = $('voicePanel'), voiceLabel = $('voiceLabel'), voiceOrb = $('voiceOrb');
+function setVoiceLabel(text){ if(voiceLabel) voiceLabel.textContent = text; }
+async function enableVoiceMode(){
+  voiceOn = true; micBtn.classList.add('on'); $('stage').classList.add('voice-mode'); voicePanel.classList.add('active');
+  setVoiceLabel('جارٍ طلب إذن الميكروفون…');
+  setStat('');
+  // Request browser permission immediately from the user's click, before checking speech recognition.
+  const ok = await startLevel();
+  if(!ok){
+    setVoiceLabel('لم يصل الميكروفون إلى الصفحة');
+    if(!window.isSecureContext && location.hostname!=='localhost' && location.hostname!=='127.0.0.1')
+      setStat('هذه الصفحة ليست HTTPS. المتصفح يمنع طلب إذن الميكروفون في الملفات المحلية؛ افتحها من رابط HTTPS في Chrome.');
+    return;
+  }
+  if(!SR){ setVoiceLabel('تم السماح بالميكروفون، لكن التعرف على الكلام غير مدعوم'); setStat('استخدم Google Chrome مع اتصال بالإنترنت، أو نحتاج خدمة تحويل صوت إلى نص عبر API.'); return; }
+  setVoiceLabel('الميكروفون جاهز… أسمعك الآن');
+  startMic();
+}
+function disableVoiceMode(){
+  voiceOn = false; clearTimeout(restartMicTimer); micBtn.classList.remove('on','rec'); $('stage').classList.remove('voice-mode'); voicePanel.classList.remove('active');
+  stopLevel(); try{ if (rec) rec.abort(); }catch(e){} micRunning = false; setStat(''); setVoiceLabel('اضغط للتحدث');
+}
+micBtn.onclick = () => { if (voiceOn) disableVoiceMode(); else enableVoiceMode(); };
+$('voiceClose').onclick = disableVoiceMode;
+voiceOrb.onclick = async () => { if (!voiceOn) await enableVoiceMode(); else if (!aStream) await enableVoiceMode(); else if (SR && !micRunning && !busy && !talking) startMic(); };
+voiceOrb.onkeydown = e => { if(e.key === 'Enter' || e.key === ' '){e.preventDefault();voiceOrb.click();} };
+
+/* ---------- Settings + test buttons ---------- */
+$('gear').onclick = () => $('panel').classList.toggle('open');
+$('close').onclick = () => $('panel').classList.remove('open');
+$('tst').onclick = () => { stopAll(); speakReply(toChunks([{text: 'مرحباً، هذا اختبار الصوت!', emotion: 'kind', gesture: 'wave'}])); };
+
+const GEST_NAMES = {none:'مرتاحتان', wave:'تلويح', point:'إشارة', self:'على صدري', describe:'وصف حجم', question:'سؤال', shrug:'مش عارفة', clap:'تصفيق'};
+const MOVE_NAMES = {center:'المنتصف', left:'يسار', right:'يمين', up:'لفوق', down:'لتحت'};
+const mkBtn = (label, fn) => { const b = document.createElement('button'); b.textContent = label; b.onclick = fn; return b; };
+Object.keys(EMO).forEach(k => $('emo').appendChild(mkBtn(EMO[k].n, () => { stopAll(); setEmo(k); })));
+Object.keys(GEST_NAMES).forEach(g => $('gest').appendChild(mkBtn(GEST_NAMES[g], () => { stopAll(); setGesture(g); })));
+Object.keys(MOVE_NAMES).forEach(m => $('mv').appendChild(mkBtn(MOVE_NAMES[m], () => { stopAll(); setMove(m); })));
+Object.keys(ACTS).forEach(a => $('acts').appendChild(mkBtn(ACTS[a].n, () => { stopAll(); playAct(ACTS[a]); })));
+
+
+/* ---------- Character picker ---------- */
+function setStop(gid, cols){
+  const g = $(gid); if (!g) return;
+  const st = g.querySelectorAll('stop');
+  cols.forEach((c, i) => { if (st[i]) st[i].setAttribute('stop-color', c); });
+}
+function miniSVG(c){
+  const t = c.theme, g = 'pg_' + c.id, f = `url(#${g})`;
+  const eyeAt = x => {
+    if (t.shape === 'visor')  return `<rect x="${x-19}" y="22" width="38" height="18" rx="9" fill="${f}" stroke="${t.rim}" stroke-width="1.2"/>`;
+    if (t.shape === 'square') return `<rect x="${x-14}" y="16" width="28" height="28" rx="6" fill="${f}" stroke="${t.rim}" stroke-width="1.2"/>`;
+    return `<circle cx="${x}" cy="30" r="${t.shape === 'dot' ? 11 : 14}" fill="${f}" stroke="${t.rim}" stroke-width="1.2"/>`;
+  };
+  return `<svg viewBox="0 0 100 60"><defs><linearGradient id="${g}" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="${t.eye[0]}"/><stop offset=".45" stop-color="${t.eye[1]}"/><stop offset="1" stop-color="${t.eye[2]}"/>
+    </linearGradient></defs>${eyeAt(34)}${eyeAt(66)}
+    <path d="M38 48 Q50 54 62 48" fill="none" stroke="${t.mouth}" stroke-width="2.6" stroke-linecap="round"/></svg>`;
+}
+function renderChars(boxId = 'chars'){
+  const box = $(boxId); if (!box) return; box.innerHTML = '';
+  CHARS.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'chcard' + (c.id === CH.id ? ' sel' : '');
+    b.innerHTML = `${miniSVG(c)}<b>${c.name}</b><small>${c.tag}</small>`;
+    b.onclick = () => applyCharacter(c.id);
+    box.appendChild(b);
+  });
+}
+function applyCharacter(id, silent){
+  const c = CHARS.find(x => x.id === id) || CHARS[0];
+  CH = c;
+  try{ localStorage.setItem('face-char', c.id); }catch(e){}
+  const TR = TRAITS[c.id] || {e: 1, bl: [2000, 5000]};
+  ENERGY = TR.e; CH_BLINK = TR.bl; hist = loadHist(c.id);
+  const t = c.theme;
+  EYE_SHAPE = t.shape; RIM = t.rim;
+  setStop('gEye', t.eye);
+  setStop('gBL', [t.brow[0], t.brow[1], t.brow[1]]);
+  setStop('gBR', [t.brow[0], t.brow[1], t.brow[1]]);
+  const glow = document.querySelector('#bGlow feDropShadow');
+  if (glow) glow.setAttribute('flood-color', t.glow);
+  MOUTH_COL = t.mouth;
+  HAND_T = t.hand;
+  $('eyes').innerHTML = eyeSVG('eyeL') + eyeSVG('eyeR');
+  $('handL').innerHTML = handSVG('L');
+  $('handR').innerHTML = handSVG('R');
+  renderChars();
+  renderChars('onbChars');
+  if (!silent){ stopAll(); runChunks(toChunks([{text: c.hello, emotion: 'wave', gesture: 'wave'}]), {speak: false}); }
+}
+
+applyCharacter(localStorage.getItem('face-char') || 'nova', true);
+/* ---------- Saved settings, preferences and onboarding ---------- */
+let PREFS = {rm: false, cap: true, big: false};
+function applyPrefs(p){
+  PREFS = {...PREFS, ...p};
+  RM = PREFS.rm;
+  $('stage').classList.toggle('nocap', !PREFS.cap);
+  $('stage').classList.toggle('bigtext', !!PREFS.big);
+  $('tRM').textContent = 'تقليل الحركة: ' + (RM ? 'تشغيل' : 'إيقاف');
+  $('tCap').textContent = 'الكابشن: ' + (PREFS.cap ? 'تشغيل' : 'إيقاف');
+  $('tBig').textContent = 'خط كبير: ' + (PREFS.big ? 'تشغيل' : 'إيقاف');
+  try{ localStorage.setItem('face-prefs', JSON.stringify(PREFS)); }catch(e){}
+}
+function showOnb(){ renderChars('onbChars'); $('onbProxy').value = proxyURL(); $('onb').style.display = 'flex'; }
+$('tRM').onclick = () => applyPrefs({rm: !PREFS.rm});
+$('tCap').onclick = () => applyPrefs({cap: !PREFS.cap});
+$('tBig').onclick = () => applyPrefs({big: !PREFS.big});
+$('tOnb').onclick = showOnb;
+$('onbGo').onclick = () => {
+  const px = $('onbProxy').value.trim().replace(/\/+$/, '');
+  $('proxy').value = px;
+  try{ localStorage.setItem('face-proxy', px); localStorage.setItem('face-onboarded', '1'); }catch(e){}
+  $('onb').style.display = 'none';
+  if (!px && !$('key').value.trim()) setStat('ضيف رابط الخادم أو مفتاح Gemini من ⚙️ عشان الشخصية تتكلم');
+};
+(function initSaved(){
+  try{
+    $('proxy').value = localStorage.getItem('face-proxy') || '';
+    const em = localStorage.getItem('face-emodel'); if (em) $('emodel').value = em;
+    applyPrefs(JSON.parse(localStorage.getItem('face-prefs') || '{}'));
+  }catch(e){}
+  $('proxy').addEventListener('change', () => { try{ localStorage.setItem('face-proxy', proxyURL()); }catch(e){} });
+  $('emodel').addEventListener('change', () => { try{ localStorage.setItem('face-emodel', $('emodel').value); }catch(e){} });
+  if (!localStorage.getItem('face-onboarded')) showOnb();
+})();
+
+requestAnimationFrame(frame);
+scheduleIdle();
+setTimeout(() => runChunks(toChunks([{text: 'أهلاً! اكتب شيئاً وأنا أرد عليك.', emotion: 'wave', gesture: 'wave'}]), {speak: false}), 500);
+</script>
+</body>
+</html>
+
