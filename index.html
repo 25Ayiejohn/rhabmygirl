@@ -281,6 +281,164 @@ function drawMouth(mc, mo){
   <div id="onb" style="display:none;position:absolute;inset:0;z-index:6;background:rgba(0,0,0,.82);align-items:center;justify-content:center;padding:16px">
     <div style="background:#0b1830;border:1px solid #1d3558;border-radius:18px;padding:18px;width:min(94%,440px);max-height:92%;overflow:auto">
       <b style="font-size:18px">أهلاً! اختار شخصيتك</b>
+      <p style="font-size:13px;color:#9fb8e0;line-height:1.7">تقدر تغيّرها بعدين من ⚙️. عشان الشخصية تتكلم محتاج رابط الخادم أو مفتاح Gemini.</p>
+      <div id="onbChars" class="cards"></div>
+      <label style="display:block;font-size:13px;color:#7f98c4;margin:12px 0 5px">رابط الخادم (مُفضّل)</label>
+      <input id="onbProxy" placeholder="https://your-worker.workers.dev" style="width:100%;padding:9px;border-radius:10px;border:1px solid #1d3558;background:#06101f;color:#dfe9ff;direction:ltr">
+      <button id="onbGo" style="width:100%;margin-top:12px;padding:10px;border-radius:12px;border:0;background:#2563eb;color:#fff;font-size:15px;cursor:pointer">ابدأ</button>
+    </div>
+  </div>
+  <div id="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center"><b>⚙️ الإعدادات</b><button id="close" aria-label="إغلاق">✕</button></div>
+    <label>اختيار النموذج (الشخصية)</label>
+    <div id="chars" class="cards"></div>
+    <label>رابط الخادم (مُفضّل: المفاتيح تبقى على الخادم)</label>
+    <input id="proxy" placeholder="https://your-worker.workers.dev" style="direction:ltr" autocomplete="off">
+    <label>مفتاح Gemini API (بديل لو مفيش خادم)</label>
+    <div class="r">
+      <input id="key" type="password" placeholder="الصق المفتاح هنا" autocomplete="off">
+      <input id="mdl" list="mdls" value="gemini-3.8-flash" style="direction:ltr">
+      <datalist id="mdls"><option value="gemini-3.8-flash"><option value="gemini-3.5-flash-lite"><option value="gemini-2.5-flash-lite"></datalist>
+    </div>
+    <label>الصوت (Google Gemini TTS — يستخدم نفس مفتاح Gemini أو الخادم)</label>
+    <select id="evoice">
+      <option value="Kore">Kore — قوي وواضح</option>
+      <option value="Puck">Puck — مرح</option>
+      <option value="Zephyr">Zephyr — مشرق</option>
+      <option value="Aoede">Aoede — خفيف</option>
+      <option value="Leda">Leda — شبابي</option>
+      <option value="Callirrhoe">Callirrhoe — هادئ</option>
+      <option value="Sulafat">Sulafat — دافئ</option>
+      <option value="Achird">Achird — ودود</option>
+      <option value="Algieba">Algieba — ناعم</option>
+      <option value="Charon">Charon — معلوماتي</option>
+      <option value="Fenrir">Fenrir — متحمس</option>
+      <option value="Orus">Orus — حازم</option>
+      <option value="Gacrux">Gacrux — ناضج</option>
+    </select>
+    <label>نموذج الصوت</label>
+    <input id="emodel" list="tmdls" value="gemini-2.5-flash-preview-tts" style="direction:ltr" autocomplete="off">
+    <datalist id="tmdls"><option value="gemini-2.5-flash-preview-tts"><option value="gemini-2.5-pro-preview-tts"></datalist>
+    <button id="tst">🔈 جرّب الصوت</button>
+    <label>الراحة وإمكانية الوصول</label>
+    <div class="grid"><button id="tRM">تقليل الحركة</button><button id="tCap">الكابشن</button><button id="tBig">خط كبير</button><button id="tOnb">شاشة البداية</button></div>
+    <label>العدادات</label>
+    <div id="counters"></div>
+    <label>تعبيرات تجريبية</label>
+    <div id="emo" class="grid"></div>
+    <label>إيماءات تجريبية</label>
+    <div id="gest" class="grid"></div>
+    <label>حركة الجسم تجريبية</label>
+    <div id="mv" class="grid"></div>
+    <label>أفعال افتراضية (وهي ساكتة)</label>
+    <div id="acts" class="grid"></div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const bubble = $('bubble'), txt = $('txt'), micBtn = $('mic');
+
+/* ---------- Expressions ----------
+   oL/oR eye openness, t lid tilt, h happy squint, mc mouth curve, mo mouth open,
+   lx/ly gaze, br brow height (+ raised), bt brow tilt (+ angry, inner corners down) */
+const KEYS = ['oL','oR','t','h','mc','mo','lx','ly','br','bt','ar','ba'];
+const EMO = {
+  calm:      {oL:1,   oR:1,   t:0,    h:0,    mc:0.35, mo:0,   lx:0,    ly:0,   br:0,    bt:0,    n:'هادئ'},
+  kind:      {oL:0.9, oR:0.9, t:0,    h:0.35, mc:0.9,  mo:0,   lx:0,    ly:0,   br:0.15, bt:0,    n:'لطيف'},
+  angry:     {oL:0.6, oR:0.6, t:0.6,  h:0,    mc:-0.5, mo:0,   lx:0,    ly:0,   br:-0.8, bt:0.6,  n:'غاضب'},
+  sad:       {oL:0.75,oR:0.75,t:-0.5, h:0,    mc:-0.7, mo:0,   lx:0,    ly:0.3, br:0.6,  bt:-0.5, n:'حزين'},
+  surprised: {oL:1.25,oR:1.25,t:0,    h:0,    mc:0,    mo:0.6, lx:0,    ly:0,   br:1,    bt:0,    n:'متفاجئ'},
+  think:     {oL:0.8, oR:0.8, t:0.15, h:0,    mc:0.1,  mo:0,   lx:0.6,  ly:-0.6,br:-0.2, bt:0.15, ba:0.75, n:'تفكير'},
+  wave:      {oL:1,   oR:1,   t:0,    h:0.2,  mc:1,    mo:0.1, lx:0,    ly:0,   br:0.3,  bt:0,    n:'ترحيب'},
+  laugh:     {oL:0.5, oR:0.5, t:0,    h:0.6,  mc:1.2,  mo:0.8, lx:0,    ly:0,   br:0.4,  bt:-0.05,n:'ضحك'},
+  cry:       {oL:0.7, oR:0.7, t:-0.5, h:0,    mc:-1,   mo:0.2, lx:0,    ly:0.3, br:0.9,  bt:-0.4, n:'بكاء'},
+  listen:    {oL:1.1, oR:1.1, t:0.1,  h:0,    mc:0.3,  mo:0,   lx:0,    ly:0,   br:0.25, bt:0.1,  n:'استماع'},
+  sleepy:    {oL:0.35,oR:0.35,t:-0.2, h:0,    mc:0.2,  mo:0,   lx:0,    ly:0.3, br:-0.1, bt:-0.2, n:'نعسان'},
+  love:      {oL:0.8, oR:0.8, t:0,    h:0.55, mc:1,    mo:0.2, lx:0,    ly:0,   br:0.3,  bt:0,    n:'حب'}
+};
+
+// Brow curvature per expression: + arched (happy/surprised), - flatter/drooping (sad/angry)
+const AR = {calm:0.5, kind:0.8, angry:-0.5, sad:-0.2, surprised:1.2, think:0.2, wave:0.8, laugh:0.9, cry:-0.4, listen:0.5, sleepy:-0.3, love:0.7};
+for (const k in EMO) { EMO[k].ar = AR[k] ?? 0.5; if (EMO[k].ba === undefined) EMO[k].ba = 0; }
+
+let EYE_SHAPE = 'round', RIM = '#ffffff';
+function eyeSVG(id){
+  const fill = 'url(#gEye)';
+  let shape;
+  if (EYE_SHAPE === 'visor')       shape = `<rect x="-96" y="-58" width="192" height="116" rx="58" fill="${fill}" stroke="${RIM}" stroke-width="2.5"/>`;
+  else if (EYE_SHAPE === 'square') shape = `<rect x="-84" y="-84" width="168" height="168" rx="34" fill="${fill}" stroke="${RIM}" stroke-width="2.5"/>`;
+  else if (EYE_SHAPE === 'dot')    shape = `<circle cx="0" cy="0" r="70" fill="${fill}" stroke="${RIM}" stroke-width="2.5"/>`;
+  else                             shape = `<circle cx="0" cy="0" r="88" fill="${fill}" stroke="${RIM}" stroke-width="2.5"/>`;
+  return `<g id="${id}">
+    ${shape}
+    <circle cx="-20" cy="-28" r="15" fill="#ffffff" opacity=".20"/>
+    <g id="${id}-ir"></g>
+    <path id="${id}-lt" fill="#000"/>
+    <path id="${id}-lb" fill="#000"/>
+  </g>`;
+}
+$('eyes').innerHTML = eyeSVG('eyeL') + eyeSVG('eyeR');
+
+function drawEye(id, o, cx, side, t, h, lx, ly){
+  const s = Math.max(o, 1), oc = Math.min(o, 1);
+  $(id).setAttribute('transform', `translate(${cx},-20) scale(${s.toFixed(3)})`);
+  $(id+'-ir').setAttribute('transform', `translate(${(lx*16).toFixed(2)},${(ly*12).toFixed(2)})`);
+  const top = -88 + (1 - oc) * 176;
+  const y = x => top + side * t * 36 * (x / 80);
+  $(id+'-lt').setAttribute('d',
+    `M -140 -320 L 140 -320 L 140 ${y(140).toFixed(2)} L -140 ${y(-140).toFixed(2)} Z`);
+  const bb = 88 - h * 62;
+  $(id+'-lb').setAttribute('d',
+    `M -140 320 L -140 ${(bb+40).toFixed(2)} Q 0 ${(bb-40).toFixed(2)} 140 ${(bb+40).toFixed(2)} L 140 320 Z`);
+}
+// Eyebrows: same colour as the eyes; raised by br, tilted by bt (inner corners down when angry)
+const browL = $('browL'), browR = $('browR');
+// Each brow is a tapered crescent: thick in the middle, thin at both ends.
+// br raises it, bt tilts it (inner end lower when angry), ar arches it.
+function browPath(side, br, bt, ar){
+  // Curved, tapered brows with soft asymmetry for a more alive expression.
+  const ox = side * 215, ix = side * 85;
+  const y = -145 - br * 24, tilt = bt * 19;
+  const oy = y - tilt, iy = y + tilt;
+  const mx = (ox + ix) / 2;
+  const arch = 9 + ar * 14;
+  const topY = (oy + iy) / 2 - arch;
+  const thickness = 6.2;
+  const outerCtrlX = ox + (ix - ox) * 0.28;
+  const innerCtrlX = ox + (ix - ox) * 0.72;
+  return `M ${ox} ${oy.toFixed(1)}
+    C ${outerCtrlX.toFixed(1)} ${(oy-arch*0.78).toFixed(1)}
+      ${innerCtrlX.toFixed(1)} ${(iy-arch*1.08).toFixed(1)} ${ix} ${iy.toFixed(1)}
+    Q ${mx.toFixed(1)} ${(topY+thickness).toFixed(1)} ${ox} ${(oy+thickness*0.35).toFixed(1)}
+    Q ${(ox- side*4).toFixed(1)} ${(oy+1.5).toFixed(1)} ${ox} ${oy.toFixed(1)} Z`;
+}
+function drawBrows(br, bt, ar, ba=0){
+  // Thinking lifts one brow slightly more than the other.
+  browL.setAttribute('d', browPath(-1, br - ba*0.45, bt, ar));
+  browR.setAttribute('d', browPath(1, br + ba*0.45, bt, ar));
+}
+const mouthEl = $('mouth');
+let MOUTH_COL = '#ffffff';
+function drawMouth(mc, mo){
+  const c = mc * 60, b = mc * 60 + mo * 120;
+  mouthEl.setAttribute('d', `M -55 0 Q 0 ${c.toFiaria-label="الإعدادات">⚙️</button>
+  <div id="dock">
+    <div id="row">
+      <input id="txt" placeholder="اكتب أو تكلّم معه...">
+      <button id="mic" type="button" title="وضع المحادثة الصوتية" aria-label="بدء المحادثة الصوتية"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3m-4 0h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+      <button id="send" aria-label="أرسل">➤</button>
+    </div>
+    <div id="voicePanel" aria-live="polite">
+      <button id="voiceClose" type="button" aria-label="إنهاء وضع الصوت">×</button>
+      <div id="voiceOrb" role="button" tabindex="0" aria-label="تفعيل الميكروفون"><svg viewBox="0 0 24 24" fill="none"><rect x="9" y="3" width="6" height="12" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3m-4 0h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <div id="voiceBars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div id="voiceLabel">اضغط للتحدث</div>
+    </div>
+  </div>
+  <div id="onb" style="display:none;position:absolute;inset:0;z-index:6;background:rgba(0,0,0,.82);align-items:center;justify-content:center;padding:16px">
+    <div style="background:#0b1830;border:1px solid #1d3558;border-radius:18px;padding:18px;width:min(94%,440px);max-height:92%;overflow:auto">
+      <b style="font-size:18px">أهلاً! اختار شخصيتك</b>
       <p style="font-size:13px;color:#9fb8e0;line-height:1.7">تقدر تغيّرها بعدين من ⚙️. عشان الشخصية تتكلم محتاج رابط الخادم أو مفتاح Google / Gemini.</p>
       <div id="onbChars" class="cards"></div>
       <label style="display:block;font-size:13px;color:#7f98c4;margin:12px 0 5px">رابط الخادم (مُفضّل)</label>
